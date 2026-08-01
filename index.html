@@ -161,21 +161,6 @@
             display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
         }
 
-        #shortsView { display: none; width: 100%; justify-content: center; align-items: center; gap: 15px; position: relative; }
-        .shorts-container {
-            width: 100%; max-width: 360px; height: calc(100vh - 130px); max-height: 680px;
-            border-radius: 20px; overflow: hidden; border: 3px solid var(--glass-border); background: #000; position: relative;
-        }
-        .shorts-container video { width: 100%; height: 100%; object-fit: cover; }
-        
-        .shorts-actions { display: flex; flex-direction: column; gap: 12px; }
-        .shorts-action-btn {
-            width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--glass-border);
-            background: var(--card-bg); color: var(--text-color); cursor: pointer;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 12px;
-        }
-
-        /* PROFİL SAYFASI (Sadece Kişisel Bilgiler & Müzik) */
         #profileView { display: none; width: 100%; flex-direction: column; gap: 15px; }
         .profile-header {
             padding: 25px; border-radius: 20px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
@@ -213,9 +198,6 @@
             #normalView { flex-direction: column; }
             header { justify-content: space-between; padding: 10px 15px; }
             .sidebar { max-height: none; }
-            .shorts-container { height: calc(100vh - 160px); }
-            #shortsView { flex-direction: column; }
-            .shorts-actions { flex-direction: row; }
         }
     </style>
 </head>
@@ -226,7 +208,6 @@
 
         <div class="nav-buttons">
             <button class="btn btn-primary" id="btnNormal" onclick="switchTab('normal')">Videolar</button>
-            <button class="btn" id="btnShorts" onclick="switchTab('shorts')">📱 Shorts</button>
             <button class="btn" id="btnProfile" onclick="switchTab('profile')" style="display:none;">👤 Profil</button>
         </div>
 
@@ -278,20 +259,6 @@
             <aside class="sidebar" id="videoList"></aside>
         </div>
 
-        <div id="shortsView">
-            <div class="shorts-container" id="shortsHolder">
-                <div class="placeholder-text">Shorts bulunamadı</div>
-            </div>
-            <div class="shorts-actions" id="shortsActionsBar" style="display:none;">
-                <button class="shorts-action-btn" onclick="nextShort(-1)">⬆️</button>
-                <button class="shorts-action-btn" id="shortsLikeBtn" onclick="toggleLikeCurrentShort('like')">👍<span id="shortsLikeCount">0</span></button>
-                <button class="shorts-action-btn" id="shortsDislikeBtn" onclick="toggleLikeCurrentShort('dislike')">👎<span id="shortsDislikeCount">0</span></button>
-                <button class="shorts-action-btn" onclick="shareCurrentVideo()">🔗</button>
-                <button class="shorts-action-btn" onclick="nextShort(1)">⬇️</button>
-            </div>
-        </div>
-
-        <!-- YENİ TEMİZ PROFİL ALANI -->
         <div id="profileView">
             <div class="profile-header glass">
                 <img id="profileAvatarDisplay" class="profile-avatar-large" src="" alt="Profil">
@@ -336,10 +303,6 @@
             <input type="text" id="vTitle" placeholder="Video Başlığı">
             <input type="file" id="vFileInput" accept="video/mp4,video/webm">
             <input type="file" id="vThumbInput" accept="image/*">
-            <select id="vType">
-                <option value="normal">Standart (16:9)</option>
-                <option value="shorts">Shorts (Dikey)</option>
-            </select>
             <textarea id="vDesc" placeholder="Açıklama"></textarea>
             <button class="btn btn-primary" id="uploadSubmitBtn" onclick="addVideo()">Yükle ve Paylaş</button>
             <button class="btn" onclick="closeModal('uploadModal')">İptal</button>
@@ -375,7 +338,6 @@
         let loadedVideos = [];
         let currentUser = JSON.parse(localStorage.getItem('oldtube_user')) || null;
         let currentPlayingVideo = null;
-        let currentShortIndex = 0;
         const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150";
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -405,7 +367,6 @@
             const title = document.getElementById('vTitle').value.trim();
             const fileInput = document.getElementById('vFileInput');
             const thumbInput = document.getElementById('vThumbInput');
-            const type = document.getElementById('vType').value;
             const desc = document.getElementById('vDesc').value.trim();
 
             if (!title) return alert("Lütfen video başlığı yazın!");
@@ -433,7 +394,7 @@
                 }
 
                 const { error: dbErr } = await supabaseClient.from('videos').insert([{
-                    title, url: videoUrl, thumb: thumbUrl, type, description: desc, author: currentUser.username
+                    title, url: videoUrl, thumb: thumbUrl, type: 'normal', description: desc, author: currentUser.username
                 }]);
 
                 if (dbErr) throw new Error("Veritabanı Kayıt Hatası: " + dbErr.message);
@@ -611,9 +572,8 @@
         function renderVideos() {
             const listContainer = document.getElementById('videoList');
             listContainer.innerHTML = '';
-            const normalVideos = loadedVideos.filter(v => v.type === 'normal');
 
-            normalVideos.forEach(v => {
+            loadedVideos.forEach(v => {
                 const card = document.createElement('div');
                 card.className = 'video-card';
                 card.onclick = () => playVideo(v);
@@ -706,23 +666,11 @@
 
         function switchTab(tab) {
             document.getElementById('normalView').style.display = tab === 'normal' ? 'flex' : 'none';
-            document.getElementById('shortsView').style.display = tab === 'shorts' ? 'flex' : 'none';
             document.getElementById('profileView').style.display = tab === 'profile' ? 'flex' : 'none';
             
             if(tab === 'profile') renderProfile();
-            if(tab === 'shorts') playShort(0);
         }
 
-        function playShort(index) {
-            const shorts = loadedVideos.filter(v => v.type === 'shorts');
-            if (shorts.length === 0) return;
-            currentShortIndex = (index + shorts.length) % shorts.length;
-            const video = shorts[currentShortIndex];
-            document.getElementById('shortsHolder').innerHTML = `<video src="${video.url}" controls autoplay loop></video>`;
-            document.getElementById('shortsActionsBar').style.display = 'flex';
-        }
-
-        function nextShort(dir) { playShort(currentShortIndex + dir); }
         function shareCurrentVideo() { navigator.clipboard.writeText(window.location.href); alert("Bağlantı Kopyalandı!"); }
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
