@@ -4,7 +4,7 @@ It is a website for nostalgia-lovers. It's OldTube.
 
 **WHAT IS OLDTUBE?**
 
-its a video platform (standalone) you can publish videos, watch
+its a video platform (standalone) you can publish videos, watch. it isn't had ads. smooth watching experience
 
 **NOTE**
 
