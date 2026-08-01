@@ -19,9 +19,9 @@
             --button-text: #ffffff;
             --input-bg: rgba(255, 255, 255, 0.85);
             
-            /* Çift Renkli Profil Değişkenleri */
-            --profile-primary-color: #ff0055; /* İsim & Dış Hat */
-            --profile-card-bg-color: #121824; /* İç Arka Plan */
+            --profile-primary-color: #ff0055;
+            --profile-page-bg: #0b2545;
+            --profile-card-darker-bg: #051324;
         }
 
         [data-theme="dark"] {
@@ -54,6 +54,10 @@
             display: flex; flex-direction: column;
         }
 
+        body.profile-active-page {
+            background: var(--profile-page-bg) !important;
+        }
+
         .glass {
             background: var(--header-bg);
             backdrop-filter: blur(12px);
@@ -84,7 +88,6 @@
             cursor: pointer;
         }
 
-        /* ARAMA ÇUBUĞU */
         .search-box {
             display: flex; align-items: center; gap: 5px; flex: 1; max-width: 380px;
             margin: 0 10px; background: var(--input-bg);
@@ -116,7 +119,6 @@
             display: inline-flex; align-items: center; gap: 6px;
         }
 
-        /* Aktif Sekme Vurgusu */
         .btn.nav-active {
             background: #ff0055 !important;
             color: #ffffff !important;
@@ -143,7 +145,6 @@
         main { display: flex; padding: 0 10px 20px 10px; gap: 15px; flex: 1; }
 
         #normalView { display: flex; width: 100%; gap: 15px; }
-
         #subscriptionsView { display: none; width: 100%; flex-direction: column; gap: 15px; }
         
         .player-section { flex: 3; display: flex; flex-direction: column; gap: 12px; }
@@ -204,11 +205,11 @@
             display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
         }
 
-        /* 🎯 YENİLENMİŞ PROFİL KART YAPISI (Dış Hat + İç Arka Plan) */
+        /* DÜZELTİLEN PROFİL KART VE SAYFA YAPISI */
         #profileView { display: none; width: 100%; flex-direction: column; gap: 15px; }
         .profile-header {
             padding: 30px; border-radius: 24px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
-            background: var(--profile-card-bg-color) !important;
+            background: var(--profile-card-darker-bg) !important;
             border: 3px solid var(--profile-primary-color) !important;
             box-shadow: 0 0 25px var(--profile-primary-color) !important;
             position: relative;
@@ -225,7 +226,7 @@
 
         .music-player-box {
             display: flex; align-items: center; gap: 10px;
-            background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 12px; margin-top: 10px;
+            background: rgba(0,0,0,0.4); padding: 8px 15px; border-radius: 12px; margin-top: 10px;
         }
 
         .modal {
@@ -288,7 +289,6 @@
     </header>
 
     <main>
-        <!-- VİDEOLAR MODU -->
         <div id="normalView">
             <section class="player-section">
                 <div class="video-container" id="playerHolder">
@@ -324,19 +324,17 @@
             <aside class="sidebar" id="videoList"></aside>
         </div>
 
-        <!-- ABONELİKLER MODU -->
         <div id="subscriptionsView">
             <h3 style="margin-bottom:10px; font-size:16px;">Aboneliklerimdeki Videolar</h3>
             <aside class="sidebar" id="subsVideoList" style="flex:1; width:100%; max-height:none;"></aside>
         </div>
 
-        <!-- PROFİL SAYFASI -->
         <div id="profileView">
             <div class="profile-header">
                 <img id="profileAvatarDisplay" class="profile-avatar-large" src="" alt="Profil">
                 <div style="flex:1;">
                     <h2 id="profileNameDisplay" class="profile-name-text">Kullanıcı Adı</h2>
-                    <p id="profileBioDisplay" style="font-size: 13px; color:#ddd; margin-top:4px;">Biyografi yok.</p>
+                    <p id="profileBioDisplay" style="font-size: 13px; color:#eee; margin-top:4px;">Biyografi yok.</p>
                     
                     <div class="music-player-box" id="profileMusicContainer" style="display:none;">
                         <span style="font-size:12px; font-weight:bold; color:#fff;">🎵 Arka Plan Müziği:</span>
@@ -381,7 +379,6 @@
         </div>
     </div>
 
-    <!-- RENK SEÇİCİLİ PROFİL DÜZENLEME MODALI -->
     <div class="modal" id="editProfileModal">
         <div class="modal-content glass">
             <h3>Profili Düzenle & Kişiselleştir</h3>
@@ -391,16 +388,14 @@
             <label style="font-size:12px; font-weight:bold;">Arka Plan MP3 Müziği:</label>
             <input type="file" id="pMusicInput" accept="audio/mp3,audio/wav">
 
-            <!-- 1. RENK SEÇENEĞİ -->
             <div class="color-picker-group">
                 <label style="font-size:12px; font-weight:bold;">1. Renk (İsim & Dış Çizgi/Parlama):</label>
                 <input type="color" id="pPrimaryColorInput" value="#ff0055" style="width:40px; height:30px; border:none; cursor:pointer;">
             </div>
 
-            <!-- 2. RENK SEÇENEĞİ -->
             <div class="color-picker-group">
-                <label style="font-size:12px; font-weight:bold;">2. Renk (Kart İç Arka Planı):</label>
-                <input type="color" id="pBgColorInput" value="#121824" style="width:40px; height:30px; border:none; cursor:pointer;">
+                <label style="font-size:12px; font-weight:bold;">2. Renk (Sayfa Arka Planı):</label>
+                <input type="color" id="pBgColorInput" value="#0b2545" style="width:40px; height:30px; border:none; cursor:pointer;">
             </div>
 
             <textarea id="pBioInput" placeholder="Biyografi / Hakkında"></textarea>
@@ -431,6 +426,16 @@
 
         function cleanFileName(str) {
             return str.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+        }
+
+        // Rengi Otomatik Koyulaştırma Fonksiyonu (Kart İçin)
+        function adjustColorBrightness(hex, percent) {
+            let num = parseInt(hex.replace("#",""), 16),
+            amt = Math.round(2.55 * percent),
+            R = (num >> 16) + amt,
+            B = (num >> 8 & 0x00FF) + amt,
+            G = (num & 0x0000FF) + amt;
+            return "#" + (0x1000000 + (R<255?R<1?0:R:255)*0x10000 + (B<255?B<1?0:B:255)*0x100 + (G<255?G<1?0:G:255)).toString(16).slice(1);
         }
 
         async function fetchVideosFromCloud() {
@@ -565,13 +570,17 @@
             document.getElementById('profileAvatarDisplay').src = currentUser.avatar || DEFAULT_AVATAR;
 
             const primaryColor = currentUser.profile_color || '#ff0055';
-            const bgColor = currentUser.profile_bg_color || '#121824';
+            const pageBgColor = currentUser.profile_bg_color || '#0b2545';
+            
+            // Kart rengini sayfa renginin %30 daha koyusu yapıyoruz
+            const cardDarkerBg = adjustColorBrightness(pageBgColor, -30);
 
             document.documentElement.style.setProperty('--profile-primary-color', primaryColor);
-            document.documentElement.style.setProperty('--profile-card-bg-color', bgColor);
+            document.documentElement.style.setProperty('--profile-page-bg', pageBgColor);
+            document.documentElement.style.setProperty('--profile-card-darker-bg', cardDarkerBg);
 
             document.getElementById('pPrimaryColorInput').value = primaryColor;
-            document.getElementById('pBgColorInput').value = bgColor;
+            document.getElementById('pBgColorInput').value = pageBgColor;
 
             const musicContainer = document.getElementById('profileMusicContainer');
             const audioPlayer = document.getElementById('profileAudioPlayer');
@@ -855,14 +864,18 @@
             document.getElementById('btnSubs').classList.remove('nav-active');
             document.getElementById('btnProfile').classList.remove('nav-active');
 
+            if (tab === 'profile') {
+                document.body.classList.add('profile-active-page');
+                document.getElementById('btnProfile').classList.add('nav-active');
+                renderProfile();
+            } else {
+                document.body.classList.remove('profile-active-page');
+            }
+
             if (tab === 'normal') document.getElementById('btnNormal').classList.add('nav-active');
             if (tab === 'subscriptions') {
                 document.getElementById('btnSubs').classList.add('nav-active');
                 renderSubscriptionsTab();
-            }
-            if (tab === 'profile') {
-                document.getElementById('btnProfile').classList.add('nav-active');
-                renderProfile();
             }
         }
 
