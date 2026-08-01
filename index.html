@@ -19,9 +19,9 @@
             --button-text: #ffffff;
             --input-bg: rgba(255, 255, 255, 0.85);
             
-            /* Çift Renkli Profil Teması */
-            --profile-accent-color: #ff0055;
-            --profile-bg-color: #1a0933;
+            /* Çift Renkli Profil Değişkenleri */
+            --profile-primary-color: #ff0055; /* İsim & Dış Hat */
+            --profile-card-bg-color: #121824; /* İç Arka Plan */
         }
 
         [data-theme="dark"] {
@@ -84,7 +84,7 @@
             cursor: pointer;
         }
 
-        /* 🔎 YENİ: İKONLU VE BUTONLU ARAMA ÇUBUĞU */
+        /* ARAMA ÇUBUĞU */
         .search-box {
             display: flex; align-items: center; gap: 5px; flex: 1; max-width: 380px;
             margin: 0 10px; background: var(--input-bg);
@@ -144,7 +144,6 @@
 
         #normalView { display: flex; width: 100%; gap: 15px; }
 
-        /* 🔔 YENİ: ABONELİKLER STİLİ */
         #subscriptionsView { display: none; width: 100%; flex-direction: column; gap: 15px; }
         
         .player-section { flex: 3; display: flex; flex-direction: column; gap: 12px; }
@@ -205,23 +204,23 @@
             display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
         }
 
-        /* ÇİFT RENKLİ PROFİL KART YAPISI */
+        /* 🎯 YENİLENMİŞ PROFİL KART YAPISI (Dış Hat + İç Arka Plan) */
         #profileView { display: none; width: 100%; flex-direction: column; gap: 15px; }
         .profile-header {
-            padding: 25px; border-radius: 20px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
-            background: var(--profile-bg-color);
-            border: 3px solid var(--profile-accent-color);
-            box-shadow: 0 0 25px var(--profile-accent-color);
+            padding: 30px; border-radius: 24px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+            background: var(--profile-card-bg-color) !important;
+            border: 3px solid var(--profile-primary-color) !important;
+            box-shadow: 0 0 25px var(--profile-primary-color) !important;
             position: relative;
         }
         .profile-avatar-large { 
-            width: 90px; height: 90px; border-radius: 50%; 
-            object-fit: cover; border: 3px solid var(--profile-accent-color); 
+            width: 95px; height: 95px; border-radius: 50%; 
+            object-fit: cover; border: 3px solid var(--profile-primary-color) !important; 
         }
         
         .profile-name-text {
-            color: var(--profile-accent-color) !important;
-            font-size: 24px; font-weight: 900;
+            color: var(--profile-primary-color) !important;
+            font-size: 26px; font-weight: 900;
         }
 
         .music-player-box {
@@ -261,7 +260,6 @@
     <header class="glass">
         <div class="logo" onclick="switchTab('normal')">📺 OldTube</div>
 
-        <!-- BÜYÜTEÇ VE ARA BUTONLU ARAMA ÇUBUĞU -->
         <div class="search-box">
             <span class="search-icon">🔍</span>
             <input type="text" id="searchInput" placeholder="Video veya kanal ara..." onkeyup="if(event.key==='Enter') handleSearch()" oninput="handleSearch()">
@@ -326,7 +324,7 @@
             <aside class="sidebar" id="videoList"></aside>
         </div>
 
-        <!-- ABONELİKLER MODU (DÜZELTİLDİ) -->
+        <!-- ABONELİKLER MODU -->
         <div id="subscriptionsView">
             <h3 style="margin-bottom:10px; font-size:16px;">Aboneliklerimdeki Videolar</h3>
             <aside class="sidebar" id="subsVideoList" style="flex:1; width:100%; max-height:none;"></aside>
@@ -383,6 +381,7 @@
         </div>
     </div>
 
+    <!-- RENK SEÇİCİLİ PROFİL DÜZENLEME MODALI -->
     <div class="modal" id="editProfileModal">
         <div class="modal-content glass">
             <h3>Profili Düzenle & Kişiselleştir</h3>
@@ -392,14 +391,16 @@
             <label style="font-size:12px; font-weight:bold;">Arka Plan MP3 Müziği:</label>
             <input type="file" id="pMusicInput" accept="audio/mp3,audio/wav">
 
+            <!-- 1. RENK SEÇENEĞİ -->
             <div class="color-picker-group">
-                <label style="font-size:12px; font-weight:bold;">İsim & Vurgu Rengi:</label>
-                <input type="color" id="pAccentColorInput" value="#ff0055" style="width:40px; height:30px; border:none; cursor:pointer;">
+                <label style="font-size:12px; font-weight:bold;">1. Renk (İsim & Dış Çizgi/Parlama):</label>
+                <input type="color" id="pPrimaryColorInput" value="#ff0055" style="width:40px; height:30px; border:none; cursor:pointer;">
             </div>
 
+            <!-- 2. RENK SEÇENEĞİ -->
             <div class="color-picker-group">
-                <label style="font-size:12px; font-weight:bold;">Kart Arka Plan Rengi:</label>
-                <input type="color" id="pBgColorInput" value="#1a0933" style="width:40px; height:30px; border:none; cursor:pointer;">
+                <label style="font-size:12px; font-weight:bold;">2. Renk (Kart İç Arka Planı):</label>
+                <input type="color" id="pBgColorInput" value="#121824" style="width:40px; height:30px; border:none; cursor:pointer;">
             </div>
 
             <textarea id="pBioInput" placeholder="Biyografi / Hakkında"></textarea>
@@ -509,7 +510,7 @@
                 const avatarInput = document.getElementById('pAvatarInput');
                 const musicInput = document.getElementById('pMusicInput');
                 const bio = document.getElementById('pBioInput').value.trim();
-                const accentColor = document.getElementById('pAccentColorInput').value;
+                const primaryColor = document.getElementById('pPrimaryColorInput').value;
                 const bgColor = document.getElementById('pBgColorInput').value;
 
                 let avatarUrl = currentUser.avatar || DEFAULT_AVATAR;
@@ -534,7 +535,7 @@
                         avatar: avatarUrl, 
                         bio: bio, 
                         bg_music: musicUrl, 
-                        profile_color: accentColor,
+                        profile_color: primaryColor,
                         profile_bg_color: bgColor 
                     })
                     .eq('id', currentUser.id)
@@ -545,7 +546,7 @@
                 currentUser = data[0];
                 localStorage.setItem('oldtube_user', JSON.stringify(currentUser));
 
-                alert("Profiliniz Çift Renk Düzeni ile Kişiselleştirildi!");
+                alert("Profil Renk Düzeniniz Kaydedildi!");
                 updateUserUI();
                 renderProfile();
                 closeModal('editProfileModal');
@@ -563,13 +564,13 @@
             document.getElementById('profileBioDisplay').innerText = currentUser.bio || "Henüz biyografi eklenmedi.";
             document.getElementById('profileAvatarDisplay').src = currentUser.avatar || DEFAULT_AVATAR;
 
-            const accentColor = currentUser.profile_color || '#ff0055';
-            const bgColor = currentUser.profile_bg_color || '#1a0933';
+            const primaryColor = currentUser.profile_color || '#ff0055';
+            const bgColor = currentUser.profile_bg_color || '#121824';
 
-            document.documentElement.style.setProperty('--profile-accent-color', accentColor);
-            document.documentElement.style.setProperty('--profile-bg-color', bgColor);
+            document.documentElement.style.setProperty('--profile-primary-color', primaryColor);
+            document.documentElement.style.setProperty('--profile-card-bg-color', bgColor);
 
-            document.getElementById('pAccentColorInput').value = accentColor;
+            document.getElementById('pPrimaryColorInput').value = primaryColor;
             document.getElementById('pBgColorInput').value = bgColor;
 
             const musicContainer = document.getElementById('profileMusicContainer');
