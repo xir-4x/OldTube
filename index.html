@@ -3,341 +3,927 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Platformu</title>
+    <title>OldTube - İnteraktif Video Platformu</title>
     <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+            --header-bg: rgba(255, 255, 255, 0.5);
+            --card-bg: rgba(255, 255, 255, 0.6);
+            --card-hover: rgba(255, 255, 255, 0.9);
+            --text-color: #0b2545;
+            --subtext-color: #3a5a40;
+            --glass-border: rgba(255, 255, 255, 0.7);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            --button-bg: linear-gradient(180deg, #56ab2f 0%, #a8e063 100%);
+            --button-text: #ffffff;
+            --input-bg: rgba(255, 255, 255, 0.85);
+        }
+
+        [data-theme="dark"] {
+            --bg-gradient: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            --header-bg: rgba(16, 28, 40, 0.7);
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --card-hover: rgba(255, 255, 255, 0.18);
+            --text-color: #e0f2fe;
+            --subtext-color: #7dd3fc;
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            --button-bg: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
+            --button-text: #ffffff;
+            --input-bg: rgba(15, 23, 42, 0.6);
+        }
+
         * {
             box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background 0.3s, color 0.3s;
         }
 
         body {
-            background-color: #0f0f0f;
-            color: #fff;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-color);
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
+        }
+
+        .glass {
+            background: var(--header-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+        }
+
+        .owner-badge {
+            color: #ff0033 !important;
+            font-weight: 900 !important;
+            letter-spacing: 1px;
+            text-shadow: 0 0 8px rgba(255, 0, 51, 0.4);
+            margin-left: 6px;
+            display: inline-block;
         }
 
         header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 30px;
-            background-color: #202020;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 30px; margin: 15px; border-radius: 20px;
+            position: sticky; top: 15px; z-index: 100;
         }
 
         .logo {
-            font-size: 22px;
-            font-weight: bold;
-            color: #ff0000;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .search-box {
-            display: flex;
-            width: 40%;
-            max-width: 600px;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 10px 15px;
-            background-color: #121212;
-            border: 1px solid #303030;
-            border-right: none;
-            color: white;
-            border-radius: 20px 0 0 20px;
-            outline: none;
-            font-size: 15px;
-        }
-
-        .search-box button {
-            padding: 10px 20px;
-            background-color: #303030;
-            border: 1px solid #303030;
-            color: white;
-            border-radius: 0 20px 20px 0;
+            font-size: 26px; font-weight: 900;
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             cursor: pointer;
-            transition: 0.2s;
         }
 
-        .search-box button:hover {
-            background-color: #404040;
+        .nav-buttons { display: flex; gap: 10px; }
+        .btn {
+            padding: 8px 16px; border-radius: 15px;
+            border: 1px solid var(--glass-border);
+            background: var(--card-bg); color: var(--text-color);
+            cursor: pointer; font-weight: bold;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-primary { background: var(--button-bg); color: var(--button-text); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+        .btn:hover:not(:disabled) { filter: brightness(1.1); }
+        .btn.active { border-color: #0072ff; background: rgba(0, 114, 255, 0.2); }
+
+        .user-section { display: flex; align-items: center; gap: 10px; }
+        .header-avatar {
+            width: 36px; height: 36px; border-radius: 50%;
+            object-fit: cover; border: 2px solid var(--glass-border); cursor: pointer;
         }
 
-        .api-key-container {
-            display: flex;
-            gap: 10px;
-        }
-
-        .api-key-container input {
-            padding: 8px 12px;
-            background-color: #121212;
-            border: 1px solid #303030;
-            color: #fff;
-            border-radius: 6px;
-            outline: none;
-            width: 200px;
-        }
-
-        .api-key-container button {
-            padding: 8px 15px;
-            background-color: #cc0000;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        main {
-            display: flex;
-            padding: 20px;
-            gap: 20px;
-            flex: 1;
-        }
-
-        .player-section {
-            flex: 3;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+        main { display: flex; padding: 0 15px 20px 15px; gap: 20px; flex: 1; }
+        .player-section { flex: 3; display: flex; flex-direction: column; gap: 15px; }
 
         .video-container {
-            position: relative;
-            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
-            height: 0;
-            background-color: #000;
-            border-radius: 12px;
-            overflow: hidden;
+            position: relative; padding-bottom: 56.25%; height: 0;
+            border-radius: 24px; overflow: hidden;
+            border: 2px solid var(--glass-border); background: #000;
         }
 
-        .video-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
+        .video-container video {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%; border: none; outline: none;
         }
 
-        .video-details h2 {
-            font-size: 20px;
-            margin-bottom: 8px;
+        .placeholder-text {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); color: #fff; text-align: center;
         }
 
-        .video-details p {
-            font-size: 14px;
-            color: #aaa;
-            line-height: 1.4;
+        /* Etkileşim Butonları Barı */
+        .actions-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--glass-border);
         }
+        .actions-right { display: flex; gap: 10px; }
+
+        /* Yorumlar Bölümü */
+        .comments-section {
+            margin-top: 15px; padding: 20px; border-radius: 20px;
+            display: flex; flex-direction: column; gap: 15px;
+        }
+
+        .comment-input-box { display: flex; gap: 10px; }
+        .comment-input-box input {
+            flex: 1; padding: 10px 15px; border-radius: 12px;
+            border: 1px solid var(--glass-border); background: var(--input-bg);
+            color: var(--text-color); outline: none;
+        }
+
+        .comment-list { display: flex; flex-direction: column; gap: 12px; }
+        .comment-item { display: flex; gap: 12px; align-items: flex-start; }
+        .comment-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+        .comment-content { background: var(--card-bg); padding: 8px 14px; border-radius: 14px; border: 1px solid var(--glass-border); }
+        .comment-author { font-size: 12px; font-weight: bold; margin-bottom: 2px; }
+        .comment-text { font-size: 13px; }
 
         .sidebar {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            max-height: calc(100vh - 100px);
-            overflow-y: auto;
+            flex: 1.2; display: flex; flex-direction: column;
+            gap: 12px; max-height: calc(100vh - 120px); overflow-y: auto;
         }
 
         .video-card {
-            display: flex;
-            gap: 10px;
-            cursor: pointer;
-            background-color: #181818;
-            padding: 8px;
-            border-radius: 8px;
-            transition: 0.2s;
+            display: flex; gap: 12px; cursor: pointer;
+            background: var(--card-bg); padding: 10px; border-radius: 16px;
+            border: 1px solid var(--glass-border); position: relative;
         }
-
-        .video-card:hover {
-            background-color: #282828;
-        }
-
-        .video-card img {
-            width: 120px;
-            height: 68px;
-            object-fit: cover;
-            border-radius: 6px;
-        }
-
-        .video-card-info {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
+        .video-card:hover { background: var(--card-hover); transform: translateY(-2px); }
+        .video-card img { width: 120px; height: 70px; object-fit: cover; border-radius: 12px; background: #333; }
+        .video-card-info { flex: 1; }
         .video-card-info h4 {
-            font-size: 13px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            line-height: 1.2;
+            font-size: 13px; color: var(--text-color);
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
         }
+        .video-card-info span { font-size: 11px; color: var(--subtext-color); }
+        .delete-btn { background: #ff4d4d; color: white; border: none; border-radius: 8px; padding: 4px 8px; font-size: 11px; cursor: pointer; margin-top: 5px; }
 
-        .video-card-info span {
-            font-size: 11px;
-            color: #aaa;
+        /* Modallar */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 200;
+            justify-content: center; align-items: center;
         }
+        .modal-content {
+            padding: 25px; border-radius: 24px; width: 90%; max-width: 440px;
+            display: flex; flex-direction: column; gap: 12px;
+        }
+        .modal-content input, .modal-content select, .modal-content textarea {
+            padding: 10px 15px; border-radius: 12px; border: 1px solid var(--glass-border);
+            background: var(--input-bg); color: var(--text-color); outline: none;
+        }
+        .file-label { font-size: 12px; font-weight: bold; margin-bottom: -5px; }
+        .rules-list { list-style: none; font-size: 12px; display: flex; flex-direction: column; gap: 4px; padding: 5px 10px; background: rgba(0,0,0,0.05); border-radius: 10px; }
+        .rules-list li { color: #d9534f; display: flex; align-items: center; gap: 6px; }
+        .rules-list li.valid { color: #28a745; font-weight: bold; }
 
-        @media (max-width: 900px) {
-            main {
-                flex-direction: column;
-            }
-            .search-box {
-                width: 100%;
-            }
-            header {
-                flex-direction: column;
-                gap: 10px;
-            }
+        /* Profil Sayfası */
+        #profileView { display: none; width: 100%; flex-direction: column; gap: 20px; }
+        .profile-header { padding: 30px; border-radius: 24px; display: flex; align-items: center; gap: 25px; position: relative; }
+        .profile-avatar-large { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 4px solid var(--glass-border); box-shadow: var(--glass-shadow); }
+        .profile-details h2 { font-size: 26px; display: flex; align-items: center; }
+        .profile-details p { color: var(--subtext-color); margin-top: 5px; font-size: 14px; }
+        .profile-links { display: flex; gap: 15px; margin-top: 10px; font-size: 13px; }
+        .profile-links a { color: var(--text-color); text-decoration: none; font-weight: bold; }
+        .profile-videos-title { font-size: 20px; margin-bottom: 15px; }
+        .profile-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; }
+
+        /* Shorts Ekranı & Dikey Etkileşimler */
+        #shortsView { display: none; width: 100%; justify-content: center; align-items: center; gap: 20px; position: relative; }
+        .shorts-container { width: 340px; height: 600px; border-radius: 24px; overflow: hidden; border: 3px solid var(--glass-border); background: #000; position: relative; }
+        .shorts-container video { width: 100%; height: 100%; object-fit: cover; }
+        
+        .shorts-actions { display: flex; flex-direction: column; gap: 15px; }
+        .shorts-action-btn {
+            width: 50px; height: 50px; border-radius: 50%; border: 1px solid var(--glass-border);
+            background: var(--card-bg); color: var(--text-color); cursor: pointer;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            font-size: 14px; font-weight: bold; box-shadow: var(--glass-shadow);
+        }
+        .shorts-action-btn:hover { background: var(--card-hover); }
+
+        /* Shorts Yorumlar Pop-up */
+        .shorts-comments-popup {
+            display: none; position: absolute; right: calc(50% - 370px); top: 50%;
+            transform: translateY(-50%); width: 300px; height: 550px;
+            border-radius: 20px; padding: 15px; flex-direction: column; gap: 10px; z-index: 50;
         }
     </style>
 </head>
-<body>
+<body data-theme="light">
 
-    <header>
-        <div class="logo">▶ VideoStream</div>
-        
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Video ara...">
-            <button onclick="searchVideos()">Ara</button>
+    <header class="glass">
+        <div class="logo" onclick="switchTab('normal')">📺 OldTube</div>
+
+        <div class="nav-buttons">
+            <button class="btn btn-primary" id="btnNormal" onclick="switchTab('normal')">Videolar</button>
+            <button class="btn" id="btnShorts" onclick="switchTab('shorts')">📱 Shorts</button>
+            <button class="btn" id="btnProfile" onclick="switchTab('profile')" style="display:none;">👤 Profilim</button>
         </div>
 
-        <div class="api-key-container">
-            <input type="password" id="apiKeyInput" placeholder="YouTube API Key Girin">
-            <button onclick="saveApiKey()">Kaydet</button>
+        <div class="user-section">
+            <button class="btn btn-primary" id="uploadBtn" onclick="openModal('uploadModal')" style="display:none;">+ MP4 Video Yükle</button>
+            
+            <div id="authButtons" style="display:flex; gap:8px;">
+                <button class="btn" onclick="openModal('loginModal')">Giriş Yap</button>
+                <button class="btn btn-primary" onclick="openModal('registerModal')">Kaydol</button>
+            </div>
+
+            <div id="userInfo" style="display:none; align-items:center; gap:10px;">
+                <img id="headerAvatarImg" class="header-avatar" src="" onclick="switchTab('profile')" title="Profilime Git">
+                <span id="usernameDisplay" style="font-weight: bold;"></span>
+                <button class="btn" onclick="logout()">Çıkış</button>
+            </div>
+            
+            <button class="btn" onclick="toggleTheme()" title="Mod Değiştir">🌙</button>
         </div>
     </header>
 
     <main>
-        <!-- Sol Taraf: Video Oynatıcı -->
-        <section class="player-section">
-            <div class="video-container">
-                <iframe id="youtubePlayer" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
-            </div>
-            <div class="video-details">
-                <h2 id="videoTitle">Bir video seçin veya arama yapın</h2>
-                <p id="videoDescription"></p>
-            </div>
-        </section>
+        <!-- KLASİK VİDEO MODU -->
+        <div id="normalView" style="display: flex; width: 100%; gap: 20px;">
+            <section class="player-section">
+                <div class="video-container" id="playerHolder">
+                    <div id="placeholder" class="placeholder-text">Henüz video seçilmedi. Giriş yapıp bilgisayarınızdan MP4 yükleyin!</div>
+                </div>
+                <div class="video-details glass">
+                    <h2 id="videoTitle">Bir video seçin</h2>
+                    <p id="videoAuthor" style="font-weight: bold; margin: 5px 0;"></p>
+                    <p id="videoDescription"></p>
 
-        <!-- Sağ Taraf: Arama / Öneri Listesi -->
-        <aside class="sidebar" id="videoList">
-            <!-- Videolar buraya yüklenecek -->
-        </aside>
+                    <!-- Like, Dislike, Share Butonları Barı -->
+                    <div class="actions-bar" id="normalActionsBar" style="display:none;">
+                        <div class="actions-right">
+                            <button class="btn" id="likeBtn" onclick="toggleLikeCurrentVideo('like')">👍 <span id="likeCount">0</span></button>
+                            <button class="btn" id="dislikeBtn" onclick="toggleLikeCurrentVideo('dislike')">👎 <span id="dislikeCount">0</span></button>
+                            <button class="btn" onclick="shareCurrentVideo()">🔗 Paylaş</button>
+                        </div>
+                    </div>
+
+                    <!-- Yorum Yapma ve Listeleme Alanı -->
+                    <div class="comments-section" id="normalCommentsSection" style="display:none;">
+                        <h3>Yorumlar (<span id="commentsCount">0</span>)</h3>
+                        <div class="comment-input-box">
+                            <input type="text" id="commentInput" placeholder="Bir yorum ekleyin...">
+                            <button class="btn btn-primary" onclick="submitComment()">Yorum Yap</button>
+                        </div>
+                        <div class="comment-list" id="commentsListContainer"></div>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="sidebar" id="videoList"></aside>
+        </div>
+
+        <!-- SHORTS MODU -->
+        <div id="shortsView">
+            <div class="shorts-container" id="shortsHolder">
+                <div class="placeholder-text">Yüklenmiş Shorts bulunamadı</div>
+            </div>
+
+            <div class="shorts-actions" id="shortsActionsBar" style="display:none;">
+                <button class="shorts-action-btn" onclick="nextShort(-1)" title="Önceki">⬆️</button>
+                <button class="shorts-action-btn" id="shortsLikeBtn" onclick="toggleLikeCurrentShort('like')">👍<span id="shortsLikeCount" style="font-size:10px;">0</span></button>
+                <button class="shorts-action-btn" id="shortsDislikeBtn" onclick="toggleLikeCurrentShort('dislike')">👎<span id="shortsDislikeCount" style="font-size:10px;">0</span></button>
+                <button class="shorts-action-btn" onclick="toggleShortsCommentsPopup()" title="Yorumlar">💬</button>
+                <button class="shorts-action-btn" onclick="shareCurrentVideo()" title="Paylaş">🔗</button>
+                <button class="shorts-action-btn" onclick="nextShort(1)" title="Sonraki">⬇️</button>
+            </div>
+
+            <!-- Shorts Yorumlar Pop-up -->
+            <div class="shorts-comments-popup glass" id="shortsCommentsPopup">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h4>Yorumlar</h4>
+                    <button class="btn" style="padding:2px 8px;" onclick="toggleShortsCommentsPopup()">✖</button>
+                </div>
+                <div class="comment-input-box" style="margin-top:5px;">
+                    <input type="text" id="shortsCommentInput" placeholder="Yorum yaz...">
+                    <button class="btn btn-primary" onclick="submitShortsComment()">Gönder</button>
+                </div>
+                <div class="comment-list" id="shortsCommentsList" style="overflow-y:auto; flex:1;"></div>
+            </div>
+        </div>
+
+        <!-- PROFİL SAYFASI -->
+        <div id="profileView">
+            <div class="profile-header glass">
+                <img id="profileAvatarDisplay" class="profile-avatar-large" src="" alt="Profil">
+                <div class="profile-details">
+                    <h2 id="profileNameDisplay">Kullanıcı Adı</h2>
+                    <p id="profileBioDisplay">Henüz biyografi eklenmedi.</p>
+                    <div class="profile-links" id="profileLinksDisplay"></div>
+                    <button class="btn btn-primary" style="margin-top: 12px;" onclick="openModal('editProfileModal')">⚙️ Profili Düzenle</button>
+                </div>
+            </div>
+
+            <h3 class="profile-videos-title">Yüklediğim Videolar</h3>
+            <div class="profile-grid" id="profileVideosGrid"></div>
+        </div>
     </main>
 
+    <!-- MODALLAR -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content glass">
+            <h3>Giriş Yap</h3>
+            <input type="text" id="loginUsername" placeholder="Kullanıcı Adı">
+            <input type="password" id="loginPassword" placeholder="Şifre">
+            <button class="btn btn-primary" onclick="login()">Giriş Yap</button>
+            <button class="btn" onclick="closeModal('loginModal')">İptal</button>
+        </div>
+    </div>
+
+    <div class="modal" id="registerModal">
+        <div class="modal-content glass">
+            <h3>Yeni Hesap Oluştur</h3>
+            <input type="text" id="regUsername" placeholder="Kullanıcı Adı Belirleyin">
+            <input type="password" id="regPassword" placeholder="Şifre Oluşturun" oninput="validatePassword()">
+            
+            <ul class="rules-list">
+                <li id="ruleLength">✖ En az 8 karakter</li>
+                <li id="ruleUpper">✖ En az 1 büyük harf (A-Z)</li>
+                <li id="ruleLower">✖ En az 1 küçük harf (a-z)</li>
+                <li id="ruleNumber">✖ En az 1 rakam (0-9)</li>
+            </ul>
+
+            <button class="btn btn-primary" id="registerBtn" onclick="register()" disabled>Hesap Oluştur</button>
+            <button class="btn" onclick="closeModal('registerModal')">İptal</button>
+        </div>
+    </div>
+
+    <div class="modal" id="editProfileModal">
+        <div class="modal-content glass">
+            <h3>Profili Düzenle</h3>
+            <span class="file-label">Profil Resmi Seç:</span>
+            <input type="file" id="pAvatarInput" accept="image/*">
+            <textarea id="pBioInput" placeholder="Biyografi / Hakkında"></textarea>
+            <input type="text" id="pSocialInput" placeholder="Sosyal Medya Linki">
+            <button class="btn btn-primary" onclick="saveProfile()">Kaydet</button>
+            <button class="btn" onclick="closeModal('editProfileModal')">İptal</button>
+        </div>
+    </div>
+
+    <div class="modal" id="uploadModal">
+        <div class="modal-content glass">
+            <h3>Bilgisayardan Video Yükle</h3>
+            <input type="text" id="vTitle" placeholder="Video Başlığı">
+            <span class="file-label">MP4 Video Dosyası Seç:</span>
+            <input type="file" id="vFileInput" accept="video/mp4,video/webm">
+            <span class="file-label">Kapak Resmi Seç (Opsiyonel):</span>
+            <input type="file" id="vThumbInput" accept="image/*">
+            <select id="vType">
+                <option value="normal">Standart Video (16:9)</option>
+                <option value="shorts">Shorts (Dikey)</option>
+            </select>
+            <textarea id="vDesc" placeholder="Açıklama"></textarea>
+            <button class="btn btn-primary" id="uploadSubmitBtn" onclick="addVideo()">Yükle ve Kaydet</button>
+            <button class="btn" onclick="closeModal('uploadModal')">İptal</button>
+        </div>
+    </div>
+
     <script>
-        let apiKey = localStorage.getItem('yt_api_key') || '';
+        let db;
+        let loadedVideos = [];
+        let users = JSON.parse(localStorage.getItem('oldtube_users')) || [];
+        let currentUser = JSON.parse(localStorage.getItem('oldtube_user')) || null;
+        let currentPlayingVideo = null;
+        let currentShortIndex = 0;
+        const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150";
 
-        // Sayfa yüklendiğinde var olan API key'i kontrol et
-        document.addEventListener('DOMContentLoaded', () => {
-            if (apiKey) {
-                document.getElementById('apiKeyInput').value = apiKey;
-                searchVideos('Yazılım'); // Varsayılan arama
-            } else {
-                alert('Lütfen devam etmek için sağ üstten YouTube API Key girin.');
-            }
-        });
-
-        function saveApiKey() {
-            const input = document.getElementById('apiKeyInput').value.trim();
-            if (input) {
-                localStorage.setItem('yt_api_key', input);
-                apiKey = input;
-                alert('API Key kaydedildi!');
-                searchVideos('Yazılım');
-            } else {
-                alert('Geçerli bir API Key girin.');
-            }
+        function checkOwnerBadge(username) {
+            return (username && username.toLowerCase() === "xir-4x") ? `<span class="owner-badge">[OWNER]</span>` : '';
         }
 
-        async function searchVideos(defaultQuery = null) {
-            if (!apiKey) {
-                alert('Arama yapmak için önce API Key kaydetmelisiniz.');
-                return;
+        // INDEXEDDB DEPOLAMA
+        const request = indexedDB.open("OldTubeDB", 1);
+        request.onupgradeneeded = (e) => {
+            db = e.target.result;
+            if (!db.objectStoreNames.contains("videos")) {
+                db.createObjectStore("videos", { keyPath: "id" });
             }
+        };
+        request.onsuccess = (e) => {
+            db = e.target.result;
+            updateUserUI();
+            fetchVideosFromDB();
+        };
 
-            const query = defaultQuery || document.getElementById('searchInput').value.trim();
-            if (!query) return;
+        function fetchVideosFromDB() {
+            const tx = db.transaction("videos", "readonly");
+            const store = tx.objectStore("videos");
+            const getAll = store.getAll();
 
-            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=15&q=${encodeURIComponent(query)}&type=video&key=${apiKey}`;
-
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-
-                if (data.error) {
-                    alert('Hata: ' + data.error.message);
-                    return;
+            getAll.onsuccess = () => {
+                loadedVideos = getAll.result || [];
+                renderVideos();
+                if (document.getElementById('profileView').style.display === 'flex') {
+                    renderProfileVideos();
                 }
-
-                renderVideoList(data.items);
-            } catch (err) {
-                console.error('Fetch Hatası:', err);
-                alert('Videolar çekilirken bir hata oluştu.');
-            }
+            };
         }
 
-        function renderVideoList(videos) {
-            const listContainer = document.getElementById('videoList');
-            listContainer.innerHTML = '';
+        function updateVideoInDB(videoObj) {
+            const tx = db.transaction("videos", "readwrite");
+            tx.objectStore("videos").put(videoObj);
+        }
 
-            if (!videos || videos.length === 0) {
-                listContainer.innerHTML = '<p>Video bulunamadı.</p>';
+        // VİDEO OYNATMA VE ETKİLEŞİMLER (LIKE/DISLIKE/YORUM)
+        function playVideo(video) {
+            currentPlayingVideo = video;
+            const holder = document.getElementById('playerHolder');
+            const videoUrl = URL.createObjectURL(video.videoBlob);
+            const ownerBadge = checkOwnerBadge(video.author);
+            
+            holder.innerHTML = `<video src="${videoUrl}" controls autoplay></video>`;
+            document.getElementById('videoTitle').innerText = video.title;
+            document.getElementById('videoAuthor').innerHTML = "Yükleyen: " + video.author + " " + ownerBadge;
+            document.getElementById('videoDescription').innerText = video.desc;
+
+            document.getElementById('normalActionsBar').style.display = 'flex';
+            document.getElementById('normalCommentsSection').style.display = 'flex';
+
+            renderInteractionUI();
+        }
+
+        function renderInteractionUI() {
+            if (!currentPlayingVideo) return;
+            
+            const likes = currentPlayingVideo.likes || [];
+            const dislikes = currentPlayingVideo.dislikes || [];
+            const comments = currentPlayingVideo.comments || [];
+
+            document.getElementById('likeCount').innerText = likes.length;
+            document.getElementById('dislikeCount').innerText = dislikes.length;
+            document.getElementById('commentsCount').innerText = comments.length;
+
+            const likeBtn = document.getElementById('likeBtn');
+            const dislikeBtn = document.getElementById('dislikeBtn');
+
+            likeBtn.classList.remove('active');
+            dislikeBtn.classList.remove('active');
+
+            if (currentUser) {
+                if (likes.includes(currentUser.username)) likeBtn.classList.add('active');
+                if (dislikes.includes(currentUser.username)) dislikeBtn.classList.add('active');
+            }
+
+            renderCommentsList();
+        }
+
+        function toggleLikeCurrentVideo(type) {
+            if (!currentUser) { alert("Beğenmek veya beğenmemek için giriş yapmalısınız!"); return; }
+            if (!currentPlayingVideo) return;
+
+            if (!currentPlayingVideo.likes) currentPlayingVideo.likes = [];
+            if (!currentPlayingVideo.dislikes) currentPlayingVideo.dislikes = [];
+
+            const username = currentUser.username;
+            const likeIdx = currentPlayingVideo.likes.indexOf(username);
+            const dislikeIdx = currentPlayingVideo.dislikes.indexOf(username);
+
+            if (type === 'like') {
+                if (likeIdx > -1) {
+                    currentPlayingVideo.likes.splice(likeIdx, 1);
+                } else {
+                    currentPlayingVideo.likes.push(username);
+                    if (dislikeIdx > -1) currentPlayingVideo.dislikes.splice(dislikeIdx, 1);
+                }
+            } else {
+                if (dislikeIdx > -1) {
+                    currentPlayingVideo.dislikes.splice(dislikeIdx, 1);
+                } else {
+                    currentPlayingVideo.dislikes.push(username);
+                    if (likeIdx > -1) currentPlayingVideo.likes.splice(likeIdx, 1);
+                }
+            }
+
+            updateVideoInDB(currentPlayingVideo);
+            renderInteractionUI();
+        }
+
+        function submitComment() {
+            if (!currentUser) { alert("Yorum yapmak için giriş yapmalısınız!"); return; }
+            const input = document.getElementById('commentInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            if (!currentPlayingVideo.comments) currentPlayingVideo.comments = [];
+
+            const userObj = users.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase()) || currentUser;
+
+            const newComment = {
+                id: Date.now(),
+                author: currentUser.username,
+                avatar: userObj.avatar || DEFAULT_AVATAR,
+                text: text
+            };
+
+            currentPlayingVideo.comments.push(newComment);
+            updateVideoInDB(currentPlayingVideo);
+            input.value = '';
+            renderInteractionUI();
+        }
+
+        function renderCommentsList() {
+            const container = document.getElementById('commentsListContainer');
+            container.innerHTML = '';
+
+            const comments = currentPlayingVideo.comments || [];
+            if (comments.length === 0) {
+                container.innerHTML = '<p style="font-size:12px; opacity:0.7;">Henüz yorum yapılmamış. İlk yorumu sen yaz!</p>';
                 return;
             }
 
-            // İlk videoyu oynatıcıya yükle
-            playVideo(videos[0].id.videoId, videos[0].snippet.title, videos[0].snippet.description);
-
-            videos.forEach(video => {
-                const videoId = video.id.videoId;
-                const title = video.snippet.title;
-                const channel = video.snippet.channelTitle;
-                const thumbnail = video.snippet.thumbnails.medium.url;
-                const description = video.snippet.description;
-
-                const card = document.createElement('div');
-                card.className = 'video-card';
-                card.onclick = () => playVideo(videoId, title, description);
-
-                card.innerHTML = `
-                    <img src="${thumbnail}" alt="${title}">
-                    <div class="video-card-info">
-                        <h4>${title}</h4>
-                        <span>${channel}</span>
+            comments.slice().reverse().forEach(c => {
+                const badge = checkOwnerBadge(c.author);
+                const item = document.createElement('div');
+                item.className = 'comment-item';
+                item.innerHTML = `
+                    <img src="${c.avatar}" class="comment-avatar">
+                    <div class="comment-content">
+                        <div class="comment-author">${c.author} ${badge}</div>
+                        <div class="comment-text">${c.text}</div>
                     </div>
                 `;
+                container.appendChild(item);
+            });
+        }
 
+        function shareCurrentVideo() {
+            navigator.clipboard.writeText(window.location.href);
+            alert("Video bağlantısı kopyalandı!");
+        }
+
+        // SHORTS ETKİLEŞİMLERİ
+        function playShort(index) {
+            const shorts = loadedVideos.filter(v => v.type === 'shorts');
+            if (shorts.length === 0) return;
+
+            if (index < 0) index = 0;
+            if (index >= shorts.length) index = shorts.length - 1;
+
+            currentShortIndex = index;
+            const video = shorts[index];
+            currentPlayingVideo = video;
+
+            const holder = document.getElementById('shortsHolder');
+            const videoUrl = URL.createObjectURL(video.videoBlob);
+
+            holder.innerHTML = `<video src="${videoUrl}" controls autoplay loop></video>`;
+            document.getElementById('shortsActionsBar').style.display = 'flex';
+
+            renderShortsInteractionUI();
+        }
+
+        function renderShortsInteractionUI() {
+            if (!currentPlayingVideo) return;
+            const likes = currentPlayingVideo.likes || [];
+            const dislikes = currentPlayingVideo.dislikes || [];
+
+            document.getElementById('shortsLikeCount').innerText = likes.length;
+            document.getElementById('shortsDislikeCount').innerText = dislikes.length;
+
+            const likeBtn = document.getElementById('shortsLikeBtn');
+            const dislikeBtn = document.getElementById('shortsDislikeBtn');
+
+            likeBtn.classList.remove('active');
+            dislikeBtn.classList.remove('active');
+
+            if (currentUser) {
+                if (likes.includes(currentUser.username)) likeBtn.classList.add('active');
+                if (dislikes.includes(currentUser.username)) dislikeBtn.classList.add('active');
+            }
+
+            renderShortsCommentsList();
+        }
+
+        function toggleLikeCurrentShort(type) {
+            toggleLikeCurrentVideo(type);
+            renderShortsInteractionUI();
+        }
+
+        function toggleShortsCommentsPopup() {
+            const popup = document.getElementById('shortsCommentsPopup');
+            popup.style.display = popup.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function submitShortsComment() {
+            if (!currentUser) { alert("Yorum yapmak için giriş yapmalısınız!"); return; }
+            const input = document.getElementById('shortsCommentInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            if (!currentPlayingVideo.comments) currentPlayingVideo.comments = [];
+            const userObj = users.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase()) || currentUser;
+
+            currentPlayingVideo.comments.push({
+                id: Date.now(), author: currentUser.username, avatar: userObj.avatar || DEFAULT_AVATAR, text: text
+            });
+
+            updateVideoInDB(currentPlayingVideo);
+            input.value = '';
+            renderShortsCommentsList();
+        }
+
+        function renderShortsCommentsList() {
+            const container = document.getElementById('shortsCommentsList');
+            container.innerHTML = '';
+            const comments = currentPlayingVideo.comments || [];
+
+            comments.slice().reverse().forEach(c => {
+                const badge = checkOwnerBadge(c.author);
+                const item = document.createElement('div');
+                item.className = 'comment-item';
+                item.innerHTML = `
+                    <img src="${c.avatar}" class="comment-avatar">
+                    <div class="comment-content">
+                        <div class="comment-author">${c.author} ${badge}</div>
+                        <div class="comment-text">${c.text}</div>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function nextShort(dir) { playShort(currentShortIndex + dir); }
+
+        // PROFİL SAYFASI İŞLEMLERİ
+        function saveProfile() {
+            if (!currentUser) return;
+            const avatarInput = document.getElementById('pAvatarInput');
+            const bio = document.getElementById('pBioInput').value.trim();
+            const social = document.getElementById('pSocialInput').value.trim();
+
+            const userIndex = users.findIndex(u => u.username.toLowerCase() === currentUser.username.toLowerCase());
+            if (userIndex === -1) return;
+
+            if (avatarInput.files && avatarInput.files.length > 0) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    users[userIndex].avatar = e.target.result;
+                    finishProfileSave(userIndex, bio, social);
+                };
+                reader.readAsDataURL(avatarInput.files[0]);
+            } else {
+                finishProfileSave(userIndex, bio, social);
+            }
+        }
+
+        function finishProfileSave(index, bio, social) {
+            users[index].bio = bio;
+            users[index].social = social;
+            localStorage.setItem('oldtube_users', JSON.stringify(users));
+
+            currentUser = users[index];
+            localStorage.setItem('oldtube_user', JSON.stringify(currentUser));
+
+            updateUserUI();
+            renderProfile();
+            closeModal('editProfileModal');
+        }
+
+        function renderProfile() {
+            if(!currentUser) return;
+            const userObj = users.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase()) || currentUser;
+
+            document.getElementById('profileNameDisplay').innerHTML = userObj.username + checkOwnerBadge(userObj.username);
+            document.getElementById('profileBioDisplay').innerText = userObj.bio || "Henüz biyografi eklenmedi.";
+            document.getElementById('profileAvatarDisplay').src = userObj.avatar || DEFAULT_AVATAR;
+
+            const linksContainer = document.getElementById('profileLinksDisplay');
+            linksContainer.innerHTML = userObj.social ? `<a href="${userObj.social}" target="_blank">🔗 Sosyal Medya Bağlantısı</a>` : '';
+
+            document.getElementById('pBioInput').value = userObj.bio || '';
+            document.getElementById('pSocialInput').value = userObj.social || '';
+
+            renderProfileVideos();
+        }
+
+        function renderProfileVideos() {
+            const grid = document.getElementById('profileVideosGrid');
+            grid.innerHTML = '';
+            const myVideos = loadedVideos.filter(v => v.author.toLowerCase() === currentUser.username.toLowerCase());
+
+            if (myVideos.length === 0) {
+                grid.innerHTML = '<p style="opacity:0.7;">Henüz yüklediğiniz bir video yok.</p>';
+                return;
+            }
+
+            myVideos.forEach(v => {
+                const card = document.createElement('div');
+                card.className = 'video-card';
+                card.onclick = () => { switchTab('normal'); playVideo(v); };
+                const thumbUrl = v.thumbBlob ? URL.createObjectURL(v.thumbBlob) : "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=300";
+
+                card.innerHTML = `
+                    <img src="${thumbUrl}" alt="${v.title}">
+                    <div class="video-card-info">
+                        <h4>${v.title}</h4>
+                        <span>Tür: ${v.type.toUpperCase()}</span>
+                        <div><button class="delete-btn" onclick="deleteVideo(${v.id}, event)">Sil</button></div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // VİDEO YÜKLEME
+        async function addVideo() {
+            const title = document.getElementById('vTitle').value.trim();
+            const fileInput = document.getElementById('vFileInput');
+            const thumbInput = document.getElementById('vThumbInput');
+            const type = document.getElementById('vType').value;
+            const desc = document.getElementById('vDesc').value.trim();
+
+            if (!title) { alert("Lütfen video başlığı yazın."); return; }
+            if (!fileInput.files || fileInput.files.length === 0) { alert("Lütfen bilgisayarınızdan bir MP4 dosyası seçin!"); return; }
+
+            const submitBtn = document.getElementById('uploadSubmitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Yükleniyor...";
+
+            const videoBlob = fileInput.files[0];
+            let thumbBlob = thumbInput.files.length > 0 ? thumbInput.files[0] : null;
+
+            const videoData = {
+                id: Date.now(), title, videoBlob, thumbBlob, type, desc,
+                author: currentUser.username, likes: [], dislikes: [], comments: []
+            };
+
+            const tx = db.transaction("videos", "readwrite");
+            tx.objectStore("videos").add(videoData);
+
+            tx.oncomplete = () => {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Yükle ve Kaydet";
+                closeModal('uploadModal');
+                
+                document.getElementById('vTitle').value = '';
+                fileInput.value = ''; thumbInput.value = '';
+                document.getElementById('vDesc').value = '';
+                fetchVideosFromDB();
+            };
+        }
+
+        function deleteVideo(id, event) {
+            event.stopPropagation();
+            if(!confirm("Bu videoyu silmek istediğinize emin misiniz?")) return;
+            const tx = db.transaction("videos", "readwrite");
+            tx.objectStore("videos").delete(id);
+            tx.oncomplete = () => { fetchVideosFromDB(); };
+        }
+
+        function renderVideos() {
+            const listContainer = document.getElementById('videoList');
+            listContainer.innerHTML = '';
+            const normalVideos = loadedVideos.filter(v => v.type === 'normal');
+
+            if(normalVideos.length === 0) {
+                listContainer.innerHTML = '<p style="padding:10px; opacity:0.7;">Henüz video yüklenmedi.</p>';
+                return;
+            }
+
+            normalVideos.forEach(v => {
+                const card = document.createElement('div');
+                card.className = 'video-card';
+                card.onclick = () => playVideo(v);
+                const thumbUrl = v.thumbBlob ? URL.createObjectURL(v.thumbBlob) : "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=300";
+                const ownerBadge = checkOwnerBadge(v.author);
+                let deleteBtnHtml = (currentUser && currentUser.username === v.author) ? `<button class="delete-btn" onclick="deleteVideo(${v.id}, event)">Sil</button>` : '';
+
+                card.innerHTML = `
+                    <img src="${thumbUrl}" alt="${v.title}">
+                    <div class="video-card-info">
+                        <h4>${v.title}</h4>
+                        <span>Yükleyen: ${v.author} ${ownerBadge}</span>
+                        <div>${deleteBtnHtml}</div>
+                    </div>
+                `;
                 listContainer.appendChild(card);
             });
         }
 
-        function playVideo(videoId, title, description) {
-            const iframe = document.getElementById('youtubePlayer');
-            iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-            document.getElementById('videoTitle').innerText = title;
-            document.getElementById('videoDescription').innerText = description;
+        // GİRİŞ/KAYIT & DİĞER FONKSİYONLAR
+        function validatePassword() {
+            const pass = document.getElementById('regPassword').value;
+            const hasLength = pass.length >= 8;
+            const hasUpper = /[A-Z]/.test(pass);
+            const hasLower = /[a-z]/.test(pass);
+            const hasNumber = /[0-9]/.test(pass);
+
+            updateRuleUI('ruleLength', hasLength, 'En az 8 karakter');
+            updateRuleUI('ruleUpper', hasUpper, 'En az 1 büyük harf (A-Z)');
+            updateRuleUI('ruleLower', hasLower, 'En az 1 küçük harf (a-z)');
+            updateRuleUI('ruleNumber', hasNumber, 'En az 1 rakam (0-9)');
+
+            document.getElementById('registerBtn').disabled = !(hasLength && hasUpper && hasLower && hasNumber);
         }
 
-        // Enter tuşu ile arama yapma
-        document.getElementById('searchInput').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                searchVideos();
+        function updateRuleUI(id, isValid, text) {
+            const el = document.getElementById(id);
+            el.className = isValid ? 'valid' : '';
+            el.innerText = (isValid ? '✔ ' : '✖ ') + text;
+        }
+
+        function register() {
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value;
+
+            if (!username) { alert("Lütfen bir kullanıcı adı girin."); return; }
+            if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
+                alert("Bu kullanıcı adı zaten alınmış!"); return;
             }
-        });
+
+            users.push({ username, password, avatar: DEFAULT_AVATAR, bio: "", social: "" });
+            localStorage.setItem('oldtube_users', JSON.stringify(users));
+
+            alert("Hesabınız oluşturuldu! Şimdi giriş yapabilirsiniz.");
+            closeModal('registerModal');
+            openModal('loginModal');
+        }
+
+        function login() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
+
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('oldtube_user', JSON.stringify(currentUser));
+                updateUserUI();
+                closeModal('loginModal');
+                fetchVideosFromDB();
+            } else {
+                alert("Kullanıcı adı veya şifre hatalı!");
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('oldtube_user');
+            updateUserUI();
+            switchTab('normal');
+            fetchVideosFromDB();
+        }
+
+        function updateUserUI() {
+            if (currentUser) {
+                const userObj = users.find(u => u.username.toLowerCase() === currentUser.username.toLowerCase()) || currentUser;
+                const ownerBadge = checkOwnerBadge(userObj.username);
+                
+                document.getElementById('authButtons').style.display = 'none';
+                document.getElementById('userInfo').style.display = 'flex';
+                document.getElementById('uploadBtn').style.display = 'block';
+                document.getElementById('btnProfile').style.display = 'block';
+                document.getElementById('usernameDisplay').innerHTML = userObj.username + ownerBadge;
+                document.getElementById('headerAvatarImg').src = userObj.avatar || DEFAULT_AVATAR;
+            } else {
+                document.getElementById('authButtons').style.display = 'flex';
+                document.getElementById('userInfo').style.display = 'none';
+                document.getElementById('uploadBtn').style.display = 'none';
+                document.getElementById('btnProfile').style.display = 'none';
+            }
+        }
+
+        function switchTab(tab) {
+            const normalView = document.getElementById('normalView');
+            const shortsView = document.getElementById('shortsView');
+            const profileView = document.getElementById('profileView');
+            
+            normalView.style.display = 'none';
+            shortsView.style.display = 'none';
+            profileView.style.display = 'none';
+
+            if (tab === 'normal') {
+                normalView.style.display = 'flex';
+            } else if (tab === 'shorts') {
+                shortsView.style.display = 'flex';
+                loadShorts();
+            } else if (tab === 'profile') {
+                profileView.style.display = 'flex';
+                renderProfile();
+            }
+        }
+
+        function loadShorts() {
+            const shorts = loadedVideos.filter(v => v.type === 'shorts');
+            if (shorts.length === 0) return;
+            playShort(0);
+        }
+
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        
+        function toggleTheme() {
+            const body = document.body;
+            const current = body.getAttribute('data-theme');
+            body.setAttribute('data-theme', current === 'light' ? 'dark' : 'light');
+        }
     </script>
 </body>
 </html>
