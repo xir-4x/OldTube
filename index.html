@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Platformu</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0f0f0f;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background-color: #202020;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #ff0000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-box {
+            display: flex;
+            width: 40%;
+            max-width: 600px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px;
+            background-color: #121212;
+            border: 1px solid #303030;
+            border-right: none;
+            color: white;
+            border-radius: 20px 0 0 20px;
+            outline: none;
+            font-size: 15px;
+        }
+
+        .search-box button {
+            padding: 10px 20px;
+            background-color: #303030;
+            border: 1px solid #303030;
+            color: white;
+            border-radius: 0 20px 20px 0;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .search-box button:hover {
+            background-color: #404040;
+        }
+
+        .api-key-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .api-key-container input {
+            padding: 8px 12px;
+            background-color: #121212;
+            border: 1px solid #303030;
+            color: #fff;
+            border-radius: 6px;
+            outline: none;
+            width: 200px;
+        }
+
+        .api-key-container button {
+            padding: 8px 15px;
+            background-color: #cc0000;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        main {
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+            flex: 1;
+        }
+
+        .player-section {
+            flex: 3;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            background-color: #000;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .video-details h2 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .video-details p {
+            font-size: 14px;
+            color: #aaa;
+            line-height: 1.4;
+        }
+
+        .sidebar {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+        }
+
+        .video-card {
+            display: flex;
+            gap: 10px;
+            cursor: pointer;
+            background-color: #181818;
+            padding: 8px;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+
+        .video-card:hover {
+            background-color: #282828;
+        }
+
+        .video-card img {
+            width: 120px;
+            height: 68px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .video-card-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .video-card-info h4 {
+            font-size: 13px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.2;
+        }
+
+        .video-card-info span {
+            font-size: 11px;
+            color: #aaa;
+        }
+
+        @media (max-width: 900px) {
+            main {
+                flex-direction: column;
+            }
+            .search-box {
+                width: 100%;
+            }
+            header {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">▶ VideoStream</div>
+        
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Video ara...">
+            <button onclick="searchVideos()">Ara</button>
+        </div>
+
+        <div class="api-key-container">
+            <input type="password" id="apiKeyInput" placeholder="YouTube API Key Girin">
+            <button onclick="saveApiKey()">Kaydet</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- Sol Taraf: Video Oynatıcı -->
+        <section class="player-section">
+            <div class="video-container">
+                <iframe id="youtubePlayer" src="https://www.youtube.com/embed/" allowfullscreen></iframe>
+            </div>
+            <div class="video-details">
+                <h2 id="videoTitle">Bir video seçin veya arama yapın</h2>
+                <p id="videoDescription"></p>
+            </div>
+        </section>
+
+        <!-- Sağ Taraf: Arama / Öneri Listesi -->
+        <aside class="sidebar" id="videoList">
+            <!-- Videolar buraya yüklenecek -->
+        </aside>
+    </main>
+
+    <script>
+        let apiKey = localStorage.getItem('yt_api_key') || '';
+
+        // Sayfa yüklendiğinde var olan API key'i kontrol et
+        document.addEventListener('DOMContentLoaded', () => {
+            if (apiKey) {
+                document.getElementById('apiKeyInput').value = apiKey;
+                searchVideos('Yazılım'); // Varsayılan arama
+            } else {
+                alert('Lütfen devam etmek için sağ üstten YouTube API Key girin.');
+            }
+        });
+
+        function saveApiKey() {
+            const input = document.getElementById('apiKeyInput').value.trim();
+            if (input) {
+                localStorage.setItem('yt_api_key', input);
+                apiKey = input;
+                alert('API Key kaydedildi!');
+                searchVideos('Yazılım');
+            } else {
+                alert('Geçerli bir API Key girin.');
+            }
+        }
+
+        async function searchVideos(defaultQuery = null) {
+            if (!apiKey) {
+                alert('Arama yapmak için önce API Key kaydetmelisiniz.');
+                return;
+            }
+
+            const query = defaultQuery || document.getElementById('searchInput').value.trim();
+            if (!query) return;
+
+            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=15&q=${encodeURIComponent(query)}&type=video&key=${apiKey}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.error) {
+                    alert('Hata: ' + data.error.message);
+                    return;
+                }
+
+                renderVideoList(data.items);
+            } catch (err) {
+                console.error('Fetch Hatası:', err);
+                alert('Videolar çekilirken bir hata oluştu.');
+            }
+        }
+
+        function renderVideoList(videos) {
+            const listContainer = document.getElementById('videoList');
+            listContainer.innerHTML = '';
+
+            if (!videos || videos.length === 0) {
+                listContainer.innerHTML = '<p>Video bulunamadı.</p>';
+                return;
+            }
+
+            // İlk videoyu oynatıcıya yükle
+            playVideo(videos[0].id.videoId, videos[0].snippet.title, videos[0].snippet.description);
+
+            videos.forEach(video => {
+                const videoId = video.id.videoId;
+                const title = video.snippet.title;
+                const channel = video.snippet.channelTitle;
+                const thumbnail = video.snippet.thumbnails.medium.url;
+                const description = video.snippet.description;
+
+                const card = document.createElement('div');
+                card.className = 'video-card';
+                card.onclick = () => playVideo(videoId, title, description);
+
+                card.innerHTML = `
+                    <img src="${thumbnail}" alt="${title}">
+                    <div class="video-card-info">
+                        <h4>${title}</h4>
+                        <span>${channel}</span>
+                    </div>
+                `;
+
+                listContainer.appendChild(card);
+            });
+        }
+
+        function playVideo(videoId, title, description) {
+            const iframe = document.getElementById('youtubePlayer');
+            iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+            document.getElementById('videoTitle').innerText = title;
+            document.getElementById('videoDescription').innerText = description;
+        }
+
+        // Enter tuşu ile arama yapma
+        document.getElementById('searchInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                searchVideos();
+            }
+        });
+    </script>
+</body>
+</html>
