@@ -5,19 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>OldTube - Küresel Video Platformu</title>
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="favicon.png?v=2">
+    <link rel="icon" type="image/png" href="favicon.png">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
-            --bg-gradient: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
-            --header-bg: rgba(255, 255, 255, 0.55);
-            --card-bg: rgba(255, 255, 255, 0.65);
-            --card-hover: rgba(255, 255, 255, 0.95);
-            --text-color: #0b2545;
-            --subtext-color: #3a5a40;
-            --glass-border: rgba(255, 255, 255, 0.75);
-            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-            --button-bg: linear-gradient(180deg, #56ab2f 0%, #a8e063 100%);
+            --bg-gradient: linear-gradient(135deg, #ffc9b0 0%, #ff9a8b 45%, #ff7e8a 100%);
+            --header-bg: rgba(255, 70, 100, 0.55);
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --card-hover: rgba(255, 235, 238, 0.95);
+            --text-color: #3a0b1f;
+            --subtext-color: #7a2e3a;
+            --glass-border: rgba(255, 210, 215, 0.75);
+            --glass-shadow: 0 8px 32px 0 rgba(180, 20, 60, 0.2);
+            --button-bg: linear-gradient(180deg, #ff5f6d 0%, #ff416c 100%);
             --button-text: #ffffff;
             --input-bg: rgba(255, 255, 255, 0.85);
             
@@ -27,17 +27,17 @@
         }
 
         [data-theme="dark"] {
-            --bg-gradient: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
-            --header-bg: rgba(16, 28, 40, 0.75);
+            --bg-gradient: linear-gradient(135deg, #2b0f14 0%, #4a1620 50%, #641f29 100%);
+            --header-bg: rgba(70, 16, 24, 0.75);
             --card-bg: rgba(255, 255, 255, 0.08);
             --card-hover: rgba(255, 255, 255, 0.18);
-            --text-color: #e0f2fe;
-            --subtext-color: #7dd3fc;
-            --glass-border: rgba(255, 255, 255, 0.15);
+            --text-color: #ffe4e8;
+            --subtext-color: #ff9aa8;
+            --glass-border: rgba(255, 120, 130, 0.2);
             --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            --button-bg: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
+            --button-bg: linear-gradient(180deg, #ff416c 0%, #c9184a 100%);
             --button-text: #ffffff;
-            --input-bg: rgba(15, 23, 42, 0.6);
+            --input-bg: rgba(30, 10, 14, 0.6);
         }
 
         * {
@@ -278,6 +278,31 @@
             background: var(--input-bg); color: var(--text-color); outline: none; font-size: 13px;
         }
 
+        .form-label {
+            font-size: 12px; font-weight: 800; opacity: 0.85; margin-top: 4px;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .upload-hint {
+            font-size: 11px; opacity: 0.65; margin-top: -6px;
+        }
+        .char-counter {
+            font-size: 11px; opacity: 0.6; align-self: flex-end; margin-top: -6px;
+        }
+        .file-drop-info {
+            display: none; font-size: 12px; padding: 8px 10px; border-radius: 10px;
+            background: var(--input-bg); border: 1px solid var(--glass-border);
+            align-items: center; gap: 8px;
+        }
+        .file-drop-info.active { display: flex; }
+        .thumb-preview-box {
+            display: none; width: 100%; height: 140px; border-radius: 12px;
+            object-fit: cover; border: 1px solid var(--glass-border); margin-top: 2px;
+        }
+        .thumb-preview-box.active { display: block; }
+        .modal-section-divider {
+            height: 1px; background: var(--glass-border); margin: 6px 0; border: none;
+        }
+
         .color-picker-group {
             display: flex; align-items: center; justify-content: space-between;
             background: var(--input-bg); padding: 8px 12px; border-radius: 10px; border: 1px solid var(--glass-border);
@@ -413,13 +438,33 @@
     </div>
 
     <div class="modal" id="uploadModal">
-        <div class="modal-content glass">
-            <h3>Video Yükle</h3>
-            <input type="text" id="vTitle" placeholder="Video Başlığı">
-            <input type="file" id="vFileInput" accept="video/mp4,video/webm">
-            <input type="file" id="vThumbInput" accept="image/*">
-            <textarea id="vDesc" placeholder="Açıklama"></textarea>
-            <button class="btn btn-primary" id="uploadSubmitBtn" onclick="addVideo()">Yükle ve Paylaş</button>
+        <div class="modal-content glass" style="max-width: 440px;">
+            <h3>🎬 Video Yükle</h3>
+
+            <label class="form-label">📝 Video Başlığı</label>
+            <input type="text" id="vTitle" placeholder="İzleyicilerin dikkatini çekecek bir başlık yazın" maxlength="100" oninput="updateTitleCounter()">
+            <span class="char-counter" id="titleCounter">0 / 100</span>
+
+            <label class="form-label">📄 Açıklama</label>
+            <textarea id="vDesc" placeholder="Video hakkında kısa bilgi verin..." maxlength="500" oninput="updateDescCounter()"></textarea>
+            <span class="char-counter" id="descCounter">0 / 500</span>
+
+            <hr class="modal-section-divider">
+
+            <label class="form-label">🎞️ Video Dosyası</label>
+            <span class="upload-hint">Desteklenen formatlar: MP4, WebM</span>
+            <input type="file" id="vFileInput" accept="video/mp4,video/webm" onchange="handleVideoFileChange(event)">
+            <div class="file-drop-info" id="vFileInfo">
+                <span>🎥</span>
+                <span id="vFileInfoText"></span>
+            </div>
+
+            <label class="form-label">🖼️ Kapak Resmi (Thumbnail)</label>
+            <span class="upload-hint">Seçmezsen otomatik bir kapak resmi atanır</span>
+            <input type="file" id="vThumbInput" accept="image/*" onchange="handleThumbFileChange(event)">
+            <img id="vThumbPreview" class="thumb-preview-box" alt="Kapak önizleme">
+
+            <button class="btn btn-primary" id="uploadSubmitBtn" onclick="addVideo()">🚀 Yükle ve Paylaş</button>
             <button class="btn" onclick="closeModal('uploadModal')">İptal</button>
         </div>
     </div>
@@ -735,6 +780,56 @@
             });
         }
 
+        function updateTitleCounter() {
+            const val = document.getElementById('vTitle').value;
+            document.getElementById('titleCounter').innerText = `${val.length} / 100`;
+        }
+
+        function updateDescCounter() {
+            const val = document.getElementById('vDesc').value;
+            document.getElementById('descCounter').innerText = `${val.length} / 500`;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + " B";
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+            return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+        }
+
+        function handleVideoFileChange(event) {
+            const infoBox = document.getElementById('vFileInfo');
+            const infoText = document.getElementById('vFileInfoText');
+            const file = event.target.files[0];
+            if (!file) { infoBox.classList.remove('active'); return; }
+            infoText.innerText = `${file.name} — ${formatFileSize(file.size)}`;
+            infoBox.classList.add('active');
+        }
+
+        function handleThumbFileChange(event) {
+            const preview = document.getElementById('vThumbPreview');
+            const file = event.target.files[0];
+            if (!file) { preview.classList.remove('active'); preview.src = ''; return; }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                preview.src = e.target.result;
+                preview.classList.add('active');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function resetUploadForm() {
+            document.getElementById('vTitle').value = '';
+            document.getElementById('vDesc').value = '';
+            document.getElementById('vFileInput').value = '';
+            document.getElementById('vThumbInput').value = '';
+            document.getElementById('vFileInfo').classList.remove('active');
+            const preview = document.getElementById('vThumbPreview');
+            preview.classList.remove('active');
+            preview.src = '';
+            updateTitleCounter();
+            updateDescCounter();
+        }
+
         async function addVideo() {
             if (!currentUser) return alert("Video yüklemek için önce giriş yapmalısınız!");
 
@@ -769,6 +864,7 @@
 
                 alert("Tebrikler! Videonuz yüklendi.");
                 closeModal('uploadModal');
+                resetUploadForm();
                 fetchCloudData();
             } catch (err) {
                 alert("HATA: " + err.message);
