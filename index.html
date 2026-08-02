@@ -99,6 +99,1385 @@
             cursor: pointer;
         }
 
+        /* 🔎 KANAL ARAMA ÇUBUĞU */
+        .search-box {
+            position: relative;
+            display: flex; align-items: center; gap: 5px; flex: 1; max-width: 380px;
+            margin: 0 10px; background: var(--input-bg);
+            border: 1px solid var(--glass-border); border-radius: 14px;
+            padding: 3px 6px 3px 12px;
+        }
+
+        .search-icon { opacity: 0.6; font-size: 14px; }
+
+        .search-box input {
+            flex: 1; border: none; background: transparent;
+            color: var(--text-color); outline: none; font-size: 13px;
+            padding: 6px 0;
+        }
+
+        .search-results-dropdown {
+            position: absolute; top: 110%; left: 0; width: 100%;
+            background: var(--header-bg); backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border); border-radius: 14px;
+            max-height: 250px; overflow-y: auto; display: none;
+            flex-direction: column; gap: 4px; padding: 6px; z-index: 150;
+            box-shadow: var(--glass-shadow);
+        }
+
+        .search-result-item {
+            padding: 8px 12px; border-radius: 10px; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
+            font-weight: bold; font-size: 13px;
+        }
+        .search-result-item:hover { background: var(--card-hover); }
+
+        .nav-buttons { display: flex; gap: 8px; }
+        
+        .btn {
+            padding: 8px 14px; border-radius: 14px;
+            border: 1px solid var(--glass-border);
+            background: var(--card-bg); color: var(--text-color);
+            cursor: pointer; font-weight: bold; font-size: 13px;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+
+        .btn.nav-active {
+            background: #ff0055 !important;
+            color: #ffffff !important;
+            border-color: #ff0055 !important;
+            box-shadow: 0 4px 12px rgba(255, 0, 85, 0.3);
+        }
+
+        .btn-primary { background: var(--button-bg); color: var(--button-text); }
+        .btn-danger { background: linear-gradient(180deg, #dc2626 0%, #991b1b 100%); color: #fff; border-color: #ef4444; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+
+        .sub-btn {
+            padding: 6px 14px; border-radius: 10px; font-size: 12px;
+            font-weight: bold; cursor: pointer; border: none; margin-left: 8px;
+            transition: transform 0.2s, background 0.2s;
+        }
+        .sub-btn:active { transform: scale(0.95); }
+        .sub-btn.subscribed { background: #4a5568; color: #fff; }
+        .sub-btn.not-subscribed { background: #ff0055; color: #fff; box-shadow: 0 2px 8px rgba(255,0,85,0.4); }
+
+        .user-section { display: flex; align-items: center; gap: 8px; }
+        .header-avatar {
+            width: 34px; height: 34px; border-radius: 50%;
+            object-fit: cover; border: 2px solid var(--glass-border); cursor: pointer;
+        }
+
+        main { display: flex; padding: 0 10px 20px 10px; gap: 15px; flex: 1; }
+
+        #normalView { display: flex; width: 100%; gap: 15px; }
+        #subscriptionsView { display: none; width: 100%; flex-direction: column; gap: 10px; }
+        
+        .player-section { flex: 3; display: flex; flex-direction: column; gap: 12px; }
+
+        .video-container {
+            position: relative; padding-bottom: 56.25%; height: 0;
+            border-radius: 20px; overflow: hidden;
+            border: 2px solid var(--glass-border); background: #000;
+        }
+
+        .video-container video {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%; border: none; outline: none;
+        }
+
+        .placeholder-text {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); color: #fff; text-align: center; width: 90%;
+        }
+
+        .actions-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--glass-border);
+            flex-wrap: wrap; gap: 8px;
+        }
+
+        .comments-section {
+            margin-top: 10px; padding: 15px; border-radius: 18px;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+
+        .comment-input-box { display: flex; gap: 8px; }
+        .comment-input-box input {
+            flex: 1; padding: 10px; border-radius: 12px;
+            border: 1px solid var(--glass-border); background: var(--input-bg);
+            color: var(--text-color); outline: none; font-size: 13px;
+        }
+
+        .comment-list { display: flex; flex-direction: column; gap: 10px; }
+        .comment-item { display: flex; gap: 10px; align-items: flex-start; }
+        .comment-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
+        .comment-content { background: var(--card-bg); padding: 8px 12px; border-radius: 12px; border: 1px solid var(--glass-border); width: 100%; }
+
+        .sidebar {
+            flex: 1.2; display: flex; flex-direction: column;
+            gap: 10px; max-height: calc(100vh - 100px); overflow-y: auto;
+        }
+
+        .video-card {
+            display: flex; gap: 10px; cursor: pointer;
+            background: var(--card-bg); padding: 8px; border-radius: 14px;
+            border: 1px solid var(--glass-border);
+            position: relative;
+        }
+        .video-card:hover { background: var(--card-hover); }
+        .video-card img { width: 110px; height: 65px; object-fit: cover; border-radius: 10px; background: #333; }
+        .video-card-info { flex: 1; }
+        .video-card-info h4 {
+            font-size: 12px; color: var(--text-color);
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
+
+        .channel-card {
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--card-bg); padding: 14px 18px; border-radius: 16px;
+            border: 1px solid var(--glass-border); cursor: pointer;
+        }
+        .channel-card:hover { background: var(--card-hover); }
+
+        #profileView { display: none; width: 100%; flex-direction: column; gap: 20px; }
+        .profile-header {
+            padding: 30px; border-radius: 24px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+            background: var(--profile-card-darker-bg) !important;
+            border: 3px solid var(--profile-primary-color) !important;
+            box-shadow: 0 0 25px var(--profile-primary-color) !important;
+            position: relative;
+        }
+        .profile-avatar-large { 
+            width: 95px; height: 95px; border-radius: 50%; 
+            object-fit: cover; border: 3px solid var(--profile-primary-color) !important; 
+        }
+        
+        .profile-name-text {
+            color: var(--profile-primary-color) !important;
+            font-size: 26px; font-weight: 900;
+        }
+
+        .profile-videos-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;
+        }
+
+        .music-player-box {
+            display: flex; align-items: center; gap: 10px;
+            background: rgba(0,0,0,0.4); padding: 8px 15px; border-radius: 12px; margin-top: 10px;
+        }
+
+        .clickable-user {
+            cursor: pointer; text-decoration: underline;
+        }
+        .clickable-user:hover { color: #ff0055; }
+
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 200;
+            justify-content: center; align-items: center; padding: 10px;
+        }
+        .modal-content {
+            padding: 20px; border-radius: 20px; width: 100%; max-width: 400px;
+            display: flex; flex-direction: column; gap: 10px; max-height: 90vh; overflow-y: auto;
+        }
+        .modal-content input, .modal-content select, .modal-content textarea {
+            padding: 10px; border-radius: 10px; border: 1px solid var(--glass-border);
+            background: var(--input-bg); color: var(--text-color); outline: none; font-size: 13px;
+        }
+
+        .form-label {
+            font-size: 12px; font-weight: 800; opacity: 0.85; margin-top: 4px;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .upload-hint {
+            font-size: 11px; opacity: 0.65; margin-top: -6px;
+        }
+        .char-counter {
+            font-size: 11px; opacity: 0.6; align-self: flex-end; margin-top: -6px;
+        }
+        .file-drop-info {
+            display: none; font-size: 12px; padding: 8px 10px; border-radius: 10px;
+            background: var(--input-bg); border: 1px solid var(--glass-border);
+            align-items: center; gap: 8px;
+        }
+        .file-drop-info.active { display: flex; }
+        .thumb-preview-box {
+            display: none; width: 100%; height: 140px; border-radius: 12px;
+            object-fit: cover; border: 1px solid var(--glass-border); margin-top: 2px;
+        }
+        .thumb-preview-box.active { display: block; }
+        .modal-section-divider {
+            height: 1px; background: var(--glass-border); margin: 6px 0; border: none;
+        }
+
+        .color-picker-group {
+            display: flex; align-items: center; justify-content: space-between;
+            background: var(--input-bg); padding: 8px 12px; border-radius: 10px; border: 1px solid var(--glass-border);
+        }
+
+        /* ÖZEL POP-UP SİSTEMİ STİLLERİ */
+        .custom-popup-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); z-index: 999;
+            justify-content: center; align-items: center; padding: 15px;
+        }
+        .custom-popup-box {
+            background: var(--header-bg);
+            border: 2px solid var(--glass-border);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            border-radius: 20px; padding: 25px; width: 100%; max-width: 420px;
+            display: flex; flex-direction: column; gap: 15px; text-align: center;
+            animation: popupAnim 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popupAnim {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        @media (max-width: 900px) {
+            #normalView { flex-direction: column; }
+            header { justify-content: space-between; padding: 10px 15px; }
+            .search-box { order: 3; max-width: 100%; width: 100%; margin: 5px 0; }
+            .sidebar { max-height: none; }
+        }
+    </style>
+</head>
+<body data-theme="light">
+
+    <header class="glass">
+        <div class="logo" onclick="switchTab('normal')">📺 OldTube</div>
+
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Kanal / Kullanıcı ara (@kullanici)..." oninput="handleChannelSearch()" onfocus="handleChannelSearch()">
+            <div class="search-results-dropdown" id="searchResultsDropdown"></div>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="btn nav-active" id="btnNormal" onclick="switchTab('normal')">Videolar</button>
+            <button class="btn" id="btnSubs" onclick="switchTab('subscriptions')">🔔 Abonelikler</button>
+            <button class="btn" id="btnProfile" onclick="switchTab('profile', currentUser ? currentUser.username : null)" style="display:none;">👤 Profilim</button>
+            <!-- @xir-4x MOD PANELİ BUTONU -->
+            <button class="btn btn-danger" id="btnModPanel" onclick="openModal('modPanelModal')" style="display:none;">🛡️ Mod Paneli</button>
+        </div>
+
+        <div class="user-section">
+            <button class="btn btn-primary" id="uploadBtn" onclick="openModal('uploadModal')" style="display:none;">+ Yükle</button>
+            <div id="authButtons" style="display:flex; gap:5px;">
+                <button class="btn" onclick="openModal('loginModal')">Giriş</button>
+                <button class="btn btn-primary" onclick="openModal('registerModal')">Kaydol</button>
+            </div>
+            <div id="userInfo" style="display:none; align-items:center; gap:8px;">
+                <img id="headerAvatarImg" class="header-avatar" src="" onclick="switchTab('profile', currentUser.username)">
+                <span id="usernameDisplay" class="clickable-user" style="font-weight: bold; font-size: 13px;" onclick="switchTab('profile', currentUser.username)"></span>
+                <button class="btn" onclick="logout()">Çıkış</button>
+            </div>
+            <button class="btn" onclick="toggleTheme()">🌙</button>
+        </div>
+    </header>
+
+    <main>
+        <div id="normalView">
+            <section class="player-section">
+                <div class="video-container" id="playerHolder">
+                    <div id="placeholder" class="placeholder-text">Videolar Yükleniyor...</div>
+                </div>
+                <div class="video-details glass">
+                    <h2 id="videoTitle" style="font-size: 18px;">Bir video seçin</h2>
+                    <div style="display:flex; align-items:center; gap:8px; margin: 6px 0;">
+                        <p id="videoAuthor" style="font-weight: bold; font-size: 13px;"></p>
+                        <div id="subButtonContainer"></div>
+                    </div>
+                    <p id="videoDescription" style="font-size: 13px;"></p>
+
+                    <div class="actions-bar" id="normalActionsBar" style="display:none;">
+                        <div>
+                            <button class="btn" id="likeBtn" onclick="toggleLikeCurrentVideo('like')">👍 <span id="likeCount">0</span></button>
+                            <button class="btn" id="dislikeBtn" onclick="toggleLikeCurrentVideo('dislike')">👎 <span id="dislikeCount">0</span></button>
+                            <button class="btn" onclick="shareCurrentVideo()">🔗 Paylaş</button>
+                            <button class="btn btn-danger" id="deleteCurrentVidBtn" onclick="deleteVideo(currentPlayingVideo.id)" style="display:none;">🗑️ Videoyu Sil</button>
+                        </div>
+                    </div>
+
+                    <div class="comments-section" id="normalCommentsSection" style="display:none;">
+                        <h4 style="font-size: 14px;">Yorumlar (<span id="commentsCount">0</span>)</h4>
+                        <div class="comment-input-box">
+                            <input type="text" id="commentInput" placeholder="Yorum yaz...">
+                            <button class="btn btn-primary" onclick="submitComment()">Gönder</button>
+                        </div>
+                        <div class="comment-list" id="commentsListContainer"></div>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="sidebar" id="videoList"></aside>
+        </div>
+
+        <div id="subscriptionsView">
+            <h3 style="margin-bottom:10px; font-size:16px;">Abone Olduğun Kanallar</h3>
+            <div id="subsChannelsList" style="display:flex; flex-direction:column; gap:10px;"></div>
+        </div>
+
+        <div id="profileView">
+            <div class="profile-header" id="profileHeaderCard">
+                <img id="profileAvatarDisplay" class="profile-avatar-large" src="" alt="Profil">
+                <div style="flex:1;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <h2 id="profileNameDisplay" class="profile-name-text">Kullanıcı Adı</h2>
+                        <div id="profilePageSubBtn"></div>
+                    </div>
+                    <p id="profileBioDisplay" style="font-size: 13px; color:#eee; margin-top:4px;">Biyografi yok.</p>
+                    
+                    <div class="music-player-box" id="profileMusicContainer" style="display:none;">
+                        <span style="font-size:12px; font-weight:bold; color:#fff;">🎵 Arka Plan Müziği:</span>
+                        <audio id="profileAudioPlayer" controls style="height:30px;"></audio>
+                    </div>
+
+                    <button class="btn btn-primary" id="editProfileBtn" style="margin-top: 12px; display:none;" onclick="openModal('editProfileModal')">⚙️ Profili Düzenle & Kişiselleştir</button>
+                </div>
+            </div>
+
+            <h3 style="font-size: 16px; margin-top: 10px;">Kanalın Videoları</h3>
+            <div class="profile-videos-grid" id="profileVideosGrid"></div>
+        </div>
+    </main>
+
+    <div class="modal" id="loginModal">
+        <div class="modal-content glass">
+            <h3>Giriş Yap</h3>
+            <input type="text" id="loginUsername" placeholder="Kullanıcı Adı (@kullanici)">
+            <input type="password" id="loginPassword" placeholder="Şifre">
+            <button class="btn btn-primary" onclick="login()">Giriş Yap</button>
+            <button class="btn" onclick="closeModal('loginModal')">İptal</button>
+        </div>
+    </div>
+
+    <div class="modal" id="registerModal">
+        <div class="modal-content glass">
+            <h3>Kayıt Ol</h3>
+            <input type="text" id="regUsername" placeholder="Kullanıcı Adı (@kullanici)">
+            <input type="password" id="regPassword" placeholder="Şifre (Min 8 Karakter)">
+            <button class="btn btn-primary" id="registerBtn" onclick="register()">Kayıt Ol</button>
+            <button class="btn" onclick="closeModal('registerModal')">İptal</button>
+        </div>
+    </div>
+
+    <div class="modal" id="uploadModal">
+        <div class="modal-content glass" style="max-width: 440px;">
+            <h3>🎬 Video Yükle</h3>
+
+            <label class="form-label">📝 Video Başlığı</label>
+            <input type="text" id="vTitle" placeholder="İzleyicilerin dikkatini çekecek bir başlık yazın" maxlength="100" oninput="updateTitleCounter()">
+            <span class="char-counter" id="titleCounter">0 / 100</span>
+
+            <label class="form-label">📄 Açıklama</label>
+            <textarea id="vDesc" placeholder="Video hakkında kısa bilgi verin..." maxlength="500" oninput="updateDescCounter()"></textarea>
+            <span class="char-counter" id="descCounter">0 / 500</span>
+
+            <hr class="modal-section-divider">
+
+            <label class="form-label">🎞️ Video Dosyası</label>
+            <span class="upload-hint">Desteklenen formatlar: MP4, WebM</span>
+            <input type="file" id="vFileInput" accept="video/mp4,video/webm" onchange="handleVideoFileChange(event)">
+            <div class="file-drop-info" id="vFileInfo">
+                <span>🎥</span>
+                <span id="vFileInfoText"></span>
+            </div>
+
+            <label class="form-label">🖼️ Kapak Resmi (Thumbnail)</label>
+            <span class="upload-hint">Seçmezsen otomatik bir kapak resmi atanır</span>
+            <input type="file" id="vThumbInput" accept="image/*" onchange="handleThumbFileChange(event)">
+            <img id="vThumbPreview" class="thumb-preview-box" alt="Kapak önizleme">
+
+            <button class="btn btn-primary" id="uploadSubmitBtn" onclick="addVideo()">🚀 Yükle ve Paylaş</button>
+            <button class="btn" onclick="closeModal('uploadModal')">İptal</button>
+        </div>
+    </div>
+
+    <div class="modal" id="editProfileModal">
+        <div class="modal-content glass">
+            <h3>Profili Düzenle & Kişiselleştir</h3>
+            <label style="font-size:12px; font-weight:bold;">Profil Resmi:</label>
+            <input type="file" id="pAvatarInput" accept="image/*">
+
+            <label style="font-size:12px; font-weight:bold;">Arka Plan MP3 Müziği:</label>
+            <input type="file" id="pMusicInput" accept="audio/mp3,audio/wav">
+
+            <div class="color-picker-group">
+                <label style="font-size:12px; font-weight:bold;">1. Renk (İsim & Dış Çizgi/Parlama):</label>
+                <input type="color" id="pPrimaryColorInput" value="#ff0055" style="width:40px; height:30px; border:none; cursor:pointer;">
+            </div>
+
+            <div class="color-picker-group">
+                <label style="font-size:12px; font-weight:bold;">2. Renk (Sayfa Arka Planı):</label>
+                <input type="color" id="pBgColorInput" value="#0b2545" style="width:40px; height:30px; border:none; cursor:pointer;">
+            </div>
+
+            <label class="form-label">🖼️ Kart Arka Plan Fotoğrafı (isteğe bağlı)</label>
+            <span class="upload-hint">Fotoğraf eklersen kart üzerindeki renk yerine bu fotoğraf gösterilir</span>
+            <input type="file" id="pBannerInput" accept="image/*" onchange="handleBannerFileChange(event)">
+            <img id="pBannerPreview" class="thumb-preview-box" alt="Kart önizleme">
+            <button class="btn" id="removeBannerBtn" style="display:none; font-size:12px;" onclick="removeBanner()">🗑️ Fotoğrafı Kaldır, Rengi Kullan</button>
+
+            <textarea id="pBioInput" placeholder="Biyografi / Hakkında"></textarea>
+            <button class="btn btn-primary" id="saveProfileBtn" onclick="saveProfile()">Değişiklikleri Kaydet</button>
+            <button class="btn" onclick="closeModal('editProfileModal')">İptal</button>
+        </div>
+    </div>
+
+    <!-- 🛡️ @xir-4x YÖNETİCİ MOD PANELİ MODAL -->
+    <div class="modal" id="modPanelModal">
+        <div class="modal-content glass" style="max-width: 460px;">
+            <h3 style="color:#ff0055; font-size:20px;">🛡️ Yönetici Mod Paneli (@xir-4x)</h3>
+            <p style="font-size:12px; opacity:0.8;">Sistemi yönetmek için özel kontrol merkezi.</p>
+            
+            <hr class="modal-section-divider">
+
+            <label class="form-label">👤 Kullanıcı Seç / Yaz:</label>
+            <input type="text" id="modTargetUser" placeholder="Hedef kullanıcı adı (xir-4x veya @xir-4x)...">
+
+            <textarea id="modUserMsg" placeholder="Gönderilecek özel uyarı veya bilgi mesajını girin..."></textarea>
+
+            <div style="display:flex; gap:8px;">
+                <button class="btn btn-primary" style="flex:1;" onclick="sendUserMessage('warn')">⚠️ Uyar</button>
+                <button class="btn" style="flex:1; background:#0099ff; color:#fff;" onclick="sendUserMessage('info')">ℹ️ Özel Bilgi</button>
+            </div>
+
+            <div style="display:flex; gap:8px; margin-top:8px;">
+                <button class="btn btn-danger" style="width:100%;" onclick="toggleUserBan(true)">🚫 Kullanıcıyı Banla</button>
+                <button class="btn" style="width:100%;" onclick="toggleUserBan(false)">✅ Banı Kaldır</button>
+            </div>
+
+            <hr class="modal-section-divider">
+
+            <label class="form-label">📢 Herkes Bilgi Sistemi (HBS) Duyurusu:</label>
+            <textarea id="hbsMsgInput" placeholder="Siteye giren herkesin göreceği pop-up mesajı yazın..."></textarea>
+            <button class="btn btn-primary" onclick="publishHBSAnnouncement()">🚀 Duyuruyu Yayınla</button>
+
+            <hr class="modal-section-divider">
+
+            <label class="form-label">🎬 Yayınlanan Videolar (Silmek için tıklayın):</label>
+            <div id="modVideoList" style="max-height:150px; overflow-y:auto; display:flex; flex-direction:column; gap:6px;"></div>
+
+            <button class="btn" onclick="closeModal('modPanelModal')" style="margin-top:10px;">Kapat</button>
+        </div>
+    </div>
+
+    <!-- 🔔 ÖZEL POP-UP BİLDİRİM BİLEŞENİ -->
+    <div class="custom-popup-overlay" id="customPopupOverlay">
+        <div class="custom-popup-box glass">
+            <h3 id="popupTitle" style="font-size:20px; color:#ff0055;">Bilgilendirme</h3>
+            <p id="popupMessage" style="font-size:14px; line-height:1.5; color:var(--text-color);"></p>
+            <button class="btn btn-primary" style="align-self:center; width:120px; justify-content:center;" onclick="closeCustomPopup()">Anladım</button>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://ptsbvovfwawrivpqolzi.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB0c2J2b3Zmd2F3cml2cHFvbHppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU1OTkzMDIsImV4cCI6MjEwMTE3NTMwMn0.2c0Q4qNjrMwWtzN1ugDm5wj5GfSoPPT35KQozgFtogU";
+
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let loadedVideos = [];
+        let loadedUsers = [];
+        let currentUser = JSON.parse(localStorage.getItem('oldtube_user')) || null;
+        let currentPlayingVideo = null;
+        let viewedProfileUser = null;
+        let bannerMarkedForRemoval = false;
+        const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150";
+
+        // KULLANICI ADI FORMATLAMA VE ESKİ KAYIT ESNEKLİĞİ
+        function formatUsername(name) {
+            if (!name) return '';
+            let cleaned = name.trim();
+            if (!cleaned.startsWith('@')) {
+                cleaned = '@' + cleaned;
+            }
+            return cleaned;
+        }
+
+        function cleanUsernameRaw(name) {
+            if (!name) return '';
+            return name.trim().replace(/^@/, '').toLowerCase();
+        }
+
+        // ESKİ VE YENİ KULLANICI İSİMLERİNİ BİRBİRİNE TAM EŞLEŞTİRME
+        function findUserByFlexName(targetName) {
+            if (!targetName) return null;
+            const targetRaw = cleanUsernameRaw(targetName);
+            return loadedUsers.find(u => cleanUsernameRaw(u.username) === targetRaw);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateUserUI();
+            fetchCloudData();
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.search-box')) {
+                    document.getElementById('searchResultsDropdown').style.display = 'none';
+                }
+            });
+        });
+
+        // 🏷️ MAVİ TİK VE SAHİP ROZETİ KONTROLÜ
+        function checkOwnerBadge(username) {
+            if (username && cleanUsernameRaw(username) === "xir-4x") {
+                return `<span class="owner-badge"><span class="blue-tick">✔</span> [OWNER]</span>`;
+            }
+            return '';
+        }
+
+        function showCustomPopup(title, message) {
+            document.getElementById('popupTitle').innerText = title;
+            document.getElementById('popupMessage').innerText = message;
+            document.getElementById('customPopupOverlay').style.display = 'flex';
+        }
+
+        function closeCustomPopup() {
+            document.getElementById('customPopupOverlay').style.display = 'none';
+        }
+
+        function cleanFileName(str) {
+            return str.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+        }
+
+        function adjustColorBrightness(hex, percent) {
+            let num = parseInt(hex.replace("#",""), 16),
+            amt = Math.round(2.55 * percent),
+            R = (num >> 16) + amt,
+            B = (num >> 8 & 0x00FF) + amt,
+            G = (num & 0x0000FF) + amt;
+            return "#" + (0x1000000 + (R<255?R<1?0:R:255)*0x10000 + (B<255?B<1?0:B:255)*0x100 + (G<255?G<1?0:G:255)).toString(16).slice(1);
+        }
+
+        async function fetchCloudData() {
+            const { data: vData } = await supabaseClient.from('videos').select('*').order('id', { ascending: false });
+            loadedVideos = vData || [];
+            
+            const { data: uData } = await supabaseClient.from('users').select('*');
+            loadedUsers = uData || [];
+
+            renderVideos(loadedVideos);
+            checkSystemNotifications();
+        }
+
+        // 🛡️ SİSTEM BİLDİRİMLERİ KONTROLÜ
+        async function checkSystemNotifications() {
+            if (!currentUser) return;
+
+            const { data } = await supabaseClient.from('users').select('*').eq('id', currentUser.id);
+            if (!data || data.length === 0) return;
+            currentUser = data[0];
+            localStorage.setItem('oldtube_user', JSON.stringify(currentUser));
+
+            // BAN KONTROLÜ
+            if (currentUser.is_banned) {
+                showCustomPopup("🛑 ERİŞİM ENGELİ!", "Hesabınız site kurallarını ihlal ettiği için yönetici (@xir-4x) tarafından yasaklanmıştır.");
+                document.body.innerHTML = `<div style="display:flex; height:100vh; align-items:center; justify-content:center; flex-direction:column; color:#ff0055; text-align:center; padding:20px;"><h1>🛑 HESABINIZ BANLANDI</h1><p>Platform erişiminiz engellenmiştir.</p></div>`;
+                return;
+            }
+
+            // UYARI SİSTEMİ POP-UP
+            if (currentUser.warning_msg) {
+                showCustomPopup("⚠️ YÖNETİCİ UYARISI", currentUser.warning_msg);
+                await supabaseClient.from('users').update({ warning_msg: null }).eq('id', currentUser.id);
+            }
+
+            // ÖZEL BİLGİ SİSTEMİ POP-UP
+            if (currentUser.info_msg) {
+                showCustomPopup("ℹ️ YÖNETİCİ BİLGİLENDİRMESİ", currentUser.info_msg);
+                await supabaseClient.from('users').update({ info_msg: null }).eq('id', currentUser.id);
+            }
+
+            // HERKES BİLGİ SİSTEMİ (HBS) POP-UP KONTROLÜ
+            const lastHBS = localStorage.getItem('last_seen_hbs');
+            const hbsNotice = localStorage.getItem('global_hbs_msg');
+            if (hbsNotice && lastHBS !== hbsNotice) {
+                showCustomPopup("📢 DUYURU (HBS)", hbsNotice);
+                localStorage.setItem('last_seen_hbs', hbsNotice);
+            }
+        }
+
+        // 🛡️ MOD PANOLU İŞLEMLERİ
+        async function sendUserMessage(type) {
+            const rawTarget = document.getElementById('modTargetUser').value.trim();
+            const msg = document.getElementById('modUserMsg').value.trim();
+            if (!rawTarget || !msg) return showCustomPopup("Hata", "Lütfen kullanıcı adı ve mesaj girin!");
+
+            const user = findUserByFlexName(rawTarget);
+            if (!user) return showCustomPopup("Hata", `${rawTarget} kullanıcısı veritabanında bulunamadı!`);
+
+            const targetFormatted = formatUsername(user.username);
+
+            if (type === 'warn') {
+                await supabaseClient.from('users').update({ warning_msg: msg }).eq('id', user.id);
+                showCustomPopup("Başarılı", `${targetFormatted} kullanıcısına UYARI mesajı gönderildi!`);
+            } else if (type === 'info') {
+                await supabaseClient.from('users').update({ info_msg: msg }).eq('id', user.id);
+                showCustomPopup("Başarılı", `${targetFormatted} kullanıcısına BİLGİ mesajı gönderildi!`);
+            }
+
+            document.getElementById('modUserMsg').value = '';
+            fetchCloudData();
+        }
+
+        async function toggleUserBan(status) {
+            const rawTarget = document.getElementById('modTargetUser').value.trim();
+            if (!rawTarget) return showCustomPopup("Hata", "Lütfen kullanıcı adı girin!");
+
+            const user = findUserByFlexName(rawTarget);
+            if (!user) return showCustomPopup("Hata", `${rawTarget} kullanıcısı bulunamadı!`);
+
+            const targetFormatted = formatUsername(user.username);
+            await supabaseClient.from('users').update({ is_banned: status }).eq('id', user.id);
+            showCustomPopup("Başarılı", `${targetFormatted} kullanıcısının ban durumu: ${status ? 'BANLANDI' : 'KALDIRILDI'}`);
+            fetchCloudData();
+        }
+
+        async function publishHBSAnnouncement() {
+            const msg = document.getElementById('hbsMsgInput').value.trim();
+            if (!msg) return showCustomPopup("Hata", "Duyuru metni boş olamaz!");
+
+            localStorage.setItem('global_hbs_msg', msg);
+            showCustomPopup("HBS Başarılı", "Herkes Bilgi Sistemi (HBS) duyurusu yayınlandı! Tüm kullanıcılar pop-up olarak görecek.");
+            document.getElementById('hbsMsgInput').value = '';
+        }
+
+        async function deleteVideo(videoId) {
+            if (!currentUser || cleanUsernameRaw(currentUser.username) !== "xir-4x") return;
+            
+            const confirmDelete = confirm("Bu videoyu silmek istediğinizden emin misiniz?");
+            if (!confirmDelete) return;
+
+            await supabaseClient.from('videos').delete().eq('id', videoId);
+            showCustomPopup("Silindi", "Video platformdan kaldırıldı.");
+            fetchCloudData();
+            if (currentPlayingVideo && currentPlayingVideo.id === videoId) {
+                document.getElementById('playerHolder').innerHTML = '<div id="placeholder" class="placeholder-text">Video Silindi.</div>';
+            }
+        }
+
+        function renderModVideoList() {
+            const container = document.getElementById('modVideoList');
+            if (!container) return;
+            container.innerHTML = '';
+            loadedVideos.forEach(v => {
+                container.innerHTML += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; background:var(--card-bg); padding:6px 10px; border-radius:8px;">
+                        <span style="font-size:12px; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:260px;">${v.title} (${formatUsername(v.author)})</span>
+                        <button class="btn btn-danger" style="font-size:10px; padding:4px 8px;" onclick="deleteVideo(${v.id})">Sil</button>
+                    </div>
+                `;
+            });
+        }
+
+        // 🔎 KANAL ARAMA SİSTEMİ
+        function handleChannelSearch() {
+            const query = cleanUsernameRaw(document.getElementById('searchInput').value);
+            const dropdown = document.getElementById('searchResultsDropdown');
+
+            if (!query) {
+                dropdown.style.display = 'none';
+                return;
+            }
+
+            const matchingUsers = loadedUsers.filter(u => cleanUsernameRaw(u.username).includes(query));
+
+            if (matchingUsers.length === 0) {
+                dropdown.innerHTML = '<div style="padding:8px; font-size:12px; opacity:0.7;">Kanal bulunamadı.</div>';
+            } else {
+                dropdown.innerHTML = matchingUsers.map(u => `
+                    <div class="search-result-item" onclick="viewUserProfile('${formatUsername(u.username)}')">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <img src="${u.avatar || DEFAULT_AVATAR}" style="width:24px; height:24px; border-radius:50%; object-fit:cover;">
+                            <span>${formatUsername(u.username)} ${checkOwnerBadge(u.username)}</span>
+                        </div>
+                        <span style="font-size:11px; opacity:0.6;">Kanalı Gör ➔</span>
+                    </div>
+                `).join('');
+            }
+
+            dropdown.style.display = 'flex';
+        }
+
+        function viewUserProfile(username) {
+            document.getElementById('searchResultsDropdown').style.display = 'none';
+            document.getElementById('searchInput').value = '';
+            switchTab('profile', username);
+        }
+
+        async function toggleSubscribe(channelAuthor) {
+            if (!currentUser) return showCustomPopup("Uyarı", "Abone olmak için giriş yapmalısınız!");
+            const myRaw = cleanUsernameRaw(currentUser.username);
+            const authorRaw = cleanUsernameRaw(channelAuthor);
+
+            if (myRaw === authorRaw) {
+                return showCustomPopup("Uyarı", "Kendi kanalınıza abone olamazsınız!");
+            }
+
+            let subs = currentUser.subscriptions || [];
+            const authorFormatted = formatUsername(channelAuthor);
+            const isSubbed = subs.some(s => cleanUsernameRaw(s) === authorRaw);
+
+            if (isSubbed) {
+                subs = subs.filter(u => cleanUsernameRaw(u) !== authorRaw);
+            } else {
+                subs.push(authorFormatted);
+            }
+
+            currentUser.subscriptions = subs;
+            localStorage.setItem('oldtube_user', JSON.stringify(currentUser));
+
+            renderSubButton(authorFormatted);
+            renderProfileSubButton(authorFormatted);
+
+            await supabaseClient.from('users').update({ subscriptions: subs }).eq('id', currentUser.id);
+
+            if (document.getElementById('subscriptionsView').style.display === 'flex') {
+                renderSubscriptionsTab();
+            }
+        }
+
+        function renderSubButton(channelAuthor) {
+            const container = document.getElementById('subButtonContainer');
+            if (!container) return;
+
+            const authorRaw = cleanUsernameRaw(channelAuthor);
+            if (!currentUser || cleanUsernameRaw(currentUser.username) === authorRaw) {
+                container.innerHTML = '';
+                return;
+            }
+
+            const isSubbed = (currentUser.subscriptions || []).some(s => cleanUsernameRaw(s) === authorRaw);
+            container.innerHTML = `
+                <button class="sub-btn ${isSubbed ? 'subscribed' : 'not-subscribed'}" onclick="toggleSubscribe('${channelAuthor}')">
+                    ${isSubbed ? '✓ Abonesin' : '🔔 Abone Ol'}
+                </button>
+            `;
+        }
+
+        function renderProfileSubButton(channelAuthor) {
+            const container = document.getElementById('profilePageSubBtn');
+            if (!container) return;
+
+            const authorRaw = cleanUsernameRaw(channelAuthor);
+            if (!currentUser || cleanUsernameRaw(currentUser.username) === authorRaw) {
+                container.innerHTML = '';
+                return;
+            }
+
+            const isSubbed = (currentUser.subscriptions || []).some(s => cleanUsernameRaw(s) === authorRaw);
+            container.innerHTML = `
+                <button class="sub-btn ${isSubbed ? 'subscribed' : 'not-subscribed'}" onclick="toggleSubscribe('${channelAuthor}')">
+                    ${isSubbed ? '✓ Abonesin' : '🔔 Abone Ol'}
+                </button>
+            `;
+        }
+
+        function handleBannerFileChange(event) {
+            const preview = document.getElementById('pBannerPreview');
+            const file = event.target.files[0];
+            if (!file) return;
+            bannerMarkedForRemoval = false;
+            document.getElementById('removeBannerBtn').style.display = 'inline-flex';
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                preview.src = e.target.result;
+                preview.classList.add('active');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeBanner() {
+            bannerMarkedForRemoval = true;
+            document.getElementById('pBannerInput').value = '';
+            const preview = document.getElementById('pBannerPreview');
+            preview.classList.remove('active');
+            preview.src = '';
+            document.getElementById('removeBannerBtn').style.display = 'none';
+        }
+
+        async function saveProfile() {
+            if (!currentUser) return showCustomPopup("Hata", "Giriş yapmalısınız!");
+
+            const btn = document.getElementById('saveProfileBtn');
+            btn.disabled = true; btn.innerText = "Kaydediliyor...";
+
+            try {
+                const avatarInput = document.getElementById('pAvatarInput');
+                const musicInput = document.getElementById('pMusicInput');
+                const bannerInput = document.getElementById('pBannerInput');
+                const bio = document.getElementById('pBioInput').value.trim();
+                const primaryColor = document.getElementById('pPrimaryColorInput').value;
+                const bgColor = document.getElementById('pBgColorInput').value;
+
+                let avatarUrl = currentUser.avatar || DEFAULT_AVATAR;
+                let musicUrl = currentUser.bg_music || null;
+                let bannerUrl = currentUser.profile_banner || null;
+
+                if (avatarInput.files.length > 0) {
+                    const file = avatarInput.files[0];
+                    const fileName = `avatar_${currentUser.id}_${Date.now()}_${cleanFileName(file.name)}`;
+                    await supabaseClient.storage.from('videos').upload(fileName, file);
+                    avatarUrl = `${SUPABASE_URL}/storage/v1/object/public/videos/${fileName}`;
+                }
+
+                if (musicInput.files.length > 0) {
+                    const musicFile = musicInput.files[0];
+                    const musicFileName = `music_${currentUser.id}_${Date.now()}_${cleanFileName(musicFile.name)}`;
+                    await supabaseClient.storage.from('videos').upload(musicFileName, musicFile);
+                    musicUrl = `${SUPABASE_URL}/storage/v1/object/public/videos/${musicFileName}`;
+                }
+
+                if (bannerMarkedForRemoval) {
+                    bannerUrl = null;
+                } else if (bannerInput.files.length > 0) {
+                    const bannerFile = bannerInput.files[0];
+                    const bannerFileName = `banner_${currentUser.id}_${Date.now()}_${cleanFileName(bannerFile.name)}`;
+                    await supabaseClient.storage.from('videos').upload(bannerFileName, bannerFile);
+                    bannerUrl = `${SUPABASE_URL}/storage/v1/object/public/videos/${bannerFileName}`;
+                }
+
+                const { data, error } = await supabaseClient.from('users')
+                    .update({ 
+                        avatar: avatarUrl,
+                        bio: bio, 
+                        bg_music: musicUrl, 
+                        profile_color: primaryColor,
+                        profile_bg_color: bgColor,
+                        profile_banner: bannerUrl
+                    })
+                    .eq('id', currentUser.id)
+                    .select();
+
+                if (error) throw error;
+
+                currentUser = data[0];
+                localStorage.setItem('oldtube_user', JSON.stringify(currentUser));
+                bannerMarkedForRemoval = false;
+
+                showCustomPopup("Başarılı", "Profiliniz Güncellendi!");
+                updateUserUI();
+                renderProfile(currentUser.username);
+                closeModal('editProfileModal');
+            } catch (err) {
+                showCustomPopup("Hata", "Profil Kayıt Hatası: " + err.message);
+            } finally {
+                btn.disabled = false; btn.innerText = "Değişiklikleri Kaydet";
+            }
+        }
+
+        // PROFİL SİSTEMİ
+        async function renderProfile(usernameTarget) {
+            const rawName = usernameTarget || (currentUser ? currentUser.username : null);
+            if (!rawName) return;
+
+            const user = findUserByFlexName(rawName);
+            viewedProfileUser = user;
+
+            if (!viewedProfileUser) {
+                showCustomPopup("Hata", `${rawName} kullanıcısı bulunamadı!`);
+                switchTab('normal');
+                return;
+            }
+
+            const formattedName = formatUsername(viewedProfileUser.username);
+
+            document.getElementById('profileNameDisplay').innerHTML = formattedName + checkOwnerBadge(viewedProfileUser.username);
+            document.getElementById('profileBioDisplay').innerText = viewedProfileUser.bio || "Henüz biyografi eklenmedi.";
+            document.getElementById('profileAvatarDisplay').src = viewedProfileUser.avatar || DEFAULT_AVATAR;
+
+            const primaryColor = viewedProfileUser.profile_color || '#ff0055';
+            const pageBgColor = viewedProfileUser.profile_bg_color || '#0b2545';
+            const cardDarkerBg = adjustColorBrightness(pageBgColor, -30);
+
+            document.documentElement.style.setProperty('--profile-primary-color', primaryColor);
+            document.documentElement.style.setProperty('--profile-page-bg', pageBgColor);
+            document.documentElement.style.setProperty('--profile-card-darker-bg', cardDarkerBg);
+
+            const headerCard = document.getElementById('profileHeaderCard');
+            if (viewedProfileUser.profile_banner) {
+                headerCard.style.setProperty('background',
+                    `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('${viewedProfileUser.profile_banner}') center / cover no-repeat`,
+                    'important');
+            } else {
+                headerCard.style.removeProperty('background');
+            }
+
+            const musicContainer = document.getElementById('profileMusicContainer');
+            const audioPlayer = document.getElementById('profileAudioPlayer');
+
+            if (viewedProfileUser.bg_music) {
+                musicContainer.style.display = 'flex';
+                audioPlayer.src = viewedProfileUser.bg_music;
+            } else {
+                musicContainer.style.display = 'none';
+                audioPlayer.src = '';
+            }
+
+            const isMyOwn = currentUser && cleanUsernameRaw(currentUser.username) === cleanUsernameRaw(viewedProfileUser.username);
+            document.getElementById('editProfileBtn').style.display = isMyOwn ? 'inline-block' : 'none';
+
+            if (isMyOwn) {
+                document.getElementById('pPrimaryColorInput').value = primaryColor;
+                document.getElementById('pBgColorInput').value = pageBgColor;
+                document.getElementById('pBioInput').value = currentUser.bio || '';
+                bannerMarkedForRemoval = false;
+                const bannerPreview = document.getElementById('pBannerPreview');
+                const removeBtn = document.getElementById('removeBannerBtn');
+                if (viewedProfileUser.profile_banner) {
+                    bannerPreview.src = viewedProfileUser.profile_banner;
+                    bannerPreview.classList.add('active');
+                    removeBtn.style.display = 'inline-flex';
+                } else {
+                    bannerPreview.src = '';
+                    bannerPreview.classList.remove('active');
+                    removeBtn.style.display = 'none';
+                }
+            } else {
+                renderProfileSubButton(formattedName);
+            }
+
+            renderUserVideos(formattedName);
+        }
+
+        function renderUserVideos(username) {
+            const grid = document.getElementById('profileVideosGrid');
+            grid.innerHTML = '';
+
+            const targetRaw = cleanUsernameRaw(username);
+            const userVids = loadedVideos.filter(v => cleanUsernameRaw(v.author) === targetRaw);
+
+            if (userVids.length === 0) {
+                grid.innerHTML = '<p style="opacity:0.7; grid-column:1/-1;">Bu kanal henüz hiç video yüklememiş.</p>';
+                return;
+            }
+
+            userVids.forEach(v => {
+                const card = document.createElement('div');
+                card.className = 'video-card';
+                card.onclick = () => { switchTab('normal'); playVideo(v); };
+                card.innerHTML = `
+                    <img src="${v.thumb || 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=300'}" alt="${v.title}">
+                    <div class="video-card-info">
+                        <h4>${v.title}</h4>
+                        <span style="font-size:11px; opacity:0.8;">Yükleyen: ${formatUsername(v.author)}</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function updateTitleCounter() {
+            const val = document.getElementById('vTitle').value;
+            document.getElementById('titleCounter').innerText = `${val.length} / 100`;
+        }
+
+        function updateDescCounter() {
+            const val = document.getElementById('vDesc').value;
+            document.getElementById('descCounter').innerText = `${val.length} / 500`;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + " B";
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+            return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+        }
+
+        function handleVideoFileChange(event) {
+            const infoBox = document.getElementById('vFileInfo');
+            const infoText = document.getElementById('vFileInfoText');
+            const file = event.target.files[0];
+            if (!file) { infoBox.classList.remove('active'); return; }
+            infoText.innerText = `${file.name} — ${formatFileSize(file.size)}`;
+            infoBox.classList.add('active');
+        }
+
+        function handleThumbFileChange(event) {
+            const preview = document.getElementById('vThumbPreview');
+            const file = event.target.files[0];
+            if (!file) { preview.classList.remove('active'); preview.src = ''; return; }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                preview.src = e.target.result;
+                preview.classList.add('active');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function resetUploadForm() {
+            document.getElementById('vTitle').value = '';
+            document.getElementById('vDesc').value = '';
+            document.getElementById('vFileInput').value = '';
+            document.getElementById('vThumbInput').value = '';
+            document.getElementById('vFileInfo').classList.remove('active');
+            const preview = document.getElementById('vThumbPreview');
+            preview.classList.remove('active');
+            preview.src = '';
+            updateTitleCounter();
+            updateDescCounter();
+        }
+
+        async function addVideo() {
+            if (!currentUser) return showCustomPopup("Hata", "Video yüklemek için önce giriş yapmalısınız!");
+
+            const title = document.getElementById('vTitle').value.trim();
+            const fileInput = document.getElementById('vFileInput');
+            const thumbInput = document.getElementById('vThumbInput');
+            const desc = document.getElementById('vDesc').value.trim();
+
+            if (!title || fileInput.files.length === 0) return showCustomPopup("Hata", "Başlık ve Video seçilmelidir!");
+
+            const submitBtn = document.getElementById('uploadSubmitBtn');
+            submitBtn.disabled = true; submitBtn.innerText = "Yükleniyor...";
+
+            try {
+                const videoFile = fileInput.files[0];
+                const videoFileName = `video_${Date.now()}_${cleanFileName(videoFile.name)}`;
+
+                await supabaseClient.storage.from('videos').upload(videoFileName, videoFile);
+                const videoUrl = `${SUPABASE_URL}/storage/v1/object/public/videos/${videoFileName}`;
+
+                let thumbUrl = "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=300";
+                if (thumbInput.files.length > 0) {
+                    const thumbFile = thumbInput.files[0];
+                    const thumbFileName = `thumb_${Date.now()}_${cleanFileName(thumbFile.name)}`;
+                    await supabaseClient.storage.from('videos').upload(thumbFileName, thumbFile);
+                    thumbUrl = `${SUPABASE_URL}/storage/v1/object/public/videos/${thumbFileName}`;
+                }
+
+                await supabaseClient.from('videos').insert([{
+                    title, url: videoUrl, thumb: thumbUrl, type: 'normal', description: desc, author: formatUsername(currentUser.username)
+                }]);
+
+                showCustomPopup("Tebrikler!", "Videonuz başarıyla yüklendi ve yayınlandı.");
+                closeModal('uploadModal');
+                resetUploadForm();
+                fetchCloudData();
+            } catch (err) {
+                showCustomPopup("Hata", "Video yükleme hatası: " + err.message);
+            } finally {
+                submitBtn.disabled = false; submitBtn.innerText = "🚀 Yükle ve Paylaş";
+            }
+        }
+
+        function playVideo(video) {
+            currentPlayingVideo = video;
+            const holder = document.getElementById('playerHolder');
+            holder.innerHTML = `<video src="${video.url}" controls autoplay></video>`;
+
+            const authorFormatted = formatUsername(video.author);
+            document.getElementById('videoTitle').innerText = video.title;
+            document.getElementById('videoAuthor').innerHTML = `Yükleyen: <span class="clickable-user" onclick="switchTab('profile', '${authorFormatted}')">${authorFormatted}</span> ${checkOwnerBadge(authorFormatted)}`;
+            document.getElementById('videoDescription').innerText = video.description || '';
+
+            renderSubButton(authorFormatted);
+
+            document.getElementById('normalActionsBar').style.display = 'flex';
+            document.getElementById('normalCommentsSection').style.display = 'flex';
+
+            if (currentUser && cleanUsernameRaw(currentUser.username) === "xir-4x") {
+                document.getElementById('deleteCurrentVidBtn').style.display = 'inline-flex';
+            } else {
+                document.getElementById('deleteCurrentVidBtn').style.display = 'none';
+            }
+
+            renderInteractionUI();
+        }
+
+        function renderInteractionUI() {
+            if (!currentPlayingVideo) return;
+            const likes = currentPlayingVideo.likes || [];
+            const dislikes = currentPlayingVideo.dislikes || [];
+            const comments = currentPlayingVideo.comments || [];
+
+            document.getElementById('likeCount').innerText = likes.length;
+            document.getElementById('dislikeCount').innerText = dislikes.length;
+            document.getElementById('commentsCount').innerText = comments.length;
+
+            renderCommentsList();
+        }
+
+        async function toggleLikeCurrentVideo(type) {
+            if (!currentUser) return showCustomPopup("Uyarı", "Giriş yapmalısınız!");
+            let likes = currentPlayingVideo.likes || [];
+            let dislikes = currentPlayingVideo.dislikes || [];
+            const user = formatUsername(currentUser.username);
+
+            if (type === 'like') {
+                likes = likes.includes(user) ? likes.filter(u => u !== user) : [...likes, user];
+                dislikes = dislikes.filter(u => u !== user);
+            } else {
+                dislikes = dislikes.includes(user) ? dislikes.filter(u => u !== user) : [...dislikes, user];
+                likes = likes.filter(u => u !== user);
+            }
+
+            currentPlayingVideo.likes = likes;
+            currentPlayingVideo.dislikes = dislikes;
+
+            await supabaseClient.from('videos').update({ likes, dislikes }).eq('id', currentPlayingVideo.id);
+            renderInteractionUI();
+        }
+
+        async function submitComment() {
+            if (!currentUser) return showCustomPopup("Uyarı", "Giriş yapmalısınız!");
+            const input = document.getElementById('commentInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            let comments = currentPlayingVideo.comments || [];
+            comments.push({ author: formatUsername(currentUser.username), avatar: currentUser.avatar || DEFAULT_AVATAR, text });
+
+            currentPlayingVideo.comments = comments;
+            await supabaseClient.from('videos').update({ comments }).eq('id', currentPlayingVideo.id);
+
+            input.value = '';
+            renderInteractionUI();
+        }
+
+        function renderCommentsList() {
+            const container = document.getElementById('commentsListContainer');
+            container.innerHTML = '';
+            (currentPlayingVideo.comments || []).slice().reverse().forEach(c => {
+                const authorFormatted = formatUsername(c.author);
+                container.innerHTML += `
+                    <div class="comment-item">
+                        <img src="${c.avatar || DEFAULT_AVATAR}" class="comment-avatar">
+                        <div class="comment-content">
+                            <div style="font-size:11px; font-weight:bold;">
+                                <span class="clickable-user" onclick="switchTab('profile', '${authorFormatted}')">${authorFormatted}</span> ${checkOwnerBadge(authorFormatted)}
+                            </div>
+                            <div style="font-size:12px; margin-top:2px;">${c.text}</div>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function renderVideos(videoArray) {
+            const listContainer = document.getElementById('videoList');
+            listContainer.innerHTML = '';
+
+            if (videoArray.length === 0) {
+                listContainer.innerHTML = '<p style="padding:10px; opacity:0.7;">Video bulunamadı.</p>';
+                return;
+            }
+
+            videoArray.forEach(v => {
+                const authorFormatted = formatUsername(v.author);
+                const card = document.createElement('div');
+                card.className = 'video-card';
+                card.onclick = () => playVideo(v);
+                card.innerHTML = `
+                    <img src="${v.thumb || 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=300'}" alt="${v.title}">
+                    <div class="video-card-info">
+                        <h4>${v.title}</h4>
+                        <span style="font-size:11px; opacity:0.8;">Kanal: ${authorFormatted} ${checkOwnerBadge(authorFormatted)}</span>
+                    </div>
+                `;
+                listContainer.appendChild(card);
+            });
+        }
+
+        function renderSubscriptionsTab() {
+            const listContainer = document.getElementById('subsChannelsList');
+            listContainer.innerHTML = '';
+
+            if (!currentUser) {
+                listContainer.innerHTML = '<p style="padding:20px;">Aboneliklerinizi görmek için giriş yapmalısınız.</p>';
+                return;
+            }
+
+            const mySubs = currentUser.subscriptions || [];
+            if (mySubs.length === 0) {
+                listContainer.innerHTML = '<p style="padding:20px;">Henüz hiçbir kanala abone olmadınız.</p>';
+                return;
+            }
+
+            mySubs.forEach(authorName => {
+                const targetUser = findUserByFlexName(authorName);
+                const formatted = targetUser ? formatUsername(targetUser.username) : formatUsername(authorName);
+                const avatar = targetUser ? (targetUser.avatar || DEFAULT_AVATAR) : DEFAULT_AVATAR;
+
+                const card = document.createElement('div');
+                card.className = 'channel-card';
+                card.onclick = () => switchTab('profile', formatted);
+                card.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <img src="${avatar}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+                        <div>
+                            <span style="font-weight:bold; font-size:14px;">${formatted}</span>
+                            ${checkOwnerBadge(formatted)}
+                        </div>
+                    </div>
+                    <button class="btn" style="font-size:11px;">Kanalı Gör ➔</button>
+                `;
+                listContainer.appendChild(card);
+            });
+        }
+
+        async function register() {
+            const rawUser = document.getElementById('regUsername').value;
+            const password = document.getElementById('regPassword').value;
+
+            if (!rawUser || !password) return showCustomPopup("Hata", "Tüm alanları doldurun!");
+
+            const username = formatUsername(rawUser);
+
+            try {
+                const existingUser = findUserByFlexName(rawUser);
+                if (existingUser) return showCustomPopup("Hata", "Bu kullanıcı adı zaten alınmış!");
+
+                const { data: newUser, error } = await supabaseClient.from('users').insert([{ 
+                    username, password, avatar: DEFAULT_AVATAR, subscriptions: []
+                }]).select();
+
+                if (error) throw error;
+
+                showCustomPopup("Başarılı", `Kayıt Başarılı! Kullanıcı adınız: ${username}`);
+                currentUser = newUser[0];
+                localStorage.setItem('oldtube_user', JSON.stringify(currentUser));
+                updateUserUI();
+                closeModal('registerModal');
+                fetchCloudData();
+            } catch (err) {
+                showCustomPopup("Kayıt Hatası", err.message);
+            }
+        }
+
+        async function login() {
+            const rawUser = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!rawUser || !password) return showCustomPopup("Hata", "Kullanıcı adı ve şifre girin!");
+
+            try {
+                const userMatch = findUserByFlexName(rawUser);
+                if (!userMatch) return showCustomPopup("Hata", "Kullanıcı adı bulunamadı!");
+
+                const { data, error } = await supabaseClient.from('users')
+                    .select('*')
+                    .eq('id', userMatch.id)
+                    .eq('password', password);
+
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    currentUser = data[0];
+                    localStorage.setItem('oldtube_user', JSON.stringify(currentUser));
+                    updateUserUI();
+                    closeModal('loginModal');
+                    showCustomPopup("Hoş Geldin!", "Giriş Yapıldı: " + formatUsername(currentUser.username));
+                    checkSystemNotifications();
+                } else {
+                    showCustomPopup("Hata", "Şifre hatalı!");
+                }
+            } catch (err) {
+                showCustomPopup("Giriş Hatası", err.message);
+            }
+        }
+
+        function logout() {
+            currentUser = null; 
+            localStorage.removeItem('oldtube_user');
+            updateUserUI(); 
+            switchTab('normal');
+        }
+
+        function updateUserUI() {
+            const isMod = currentUser && cleanUsernameRaw(currentUser.username) === "xir-4x";
+            
+            if (currentUser) {
+                document.getElementById('authButtons').style.display = 'none';
+                document.getElementById('userInfo').style.display = 'flex';
+                document.getElementById('uploadBtn').style.display = 'block';
+                document.getElementById('btnProfile').style.display = 'block';
+                document.getElementById('usernameDisplay').innerHTML = formatUsername(currentUser.username) + checkOwnerBadge(currentUser.username);
+                document.getElementById('headerAvatarImg').src = currentUser.avatar || DEFAULT_AVATAR;
+
+                document.getElementById('btnModPanel').style.display = isMod ? 'inline-flex' : 'none';
+            } else {
+                document.getElementById('authButtons').style.display = 'flex';
+                document.getElementById('userInfo').style.display = 'none';
+                document.getElementById('uploadBtn').style.display = 'none';
+                document.getElementById('btnProfile').style.display = 'none';
+                document.getElementById('btnModPanel').style.display = 'none';
+            }
+        }
+
+        function switchTab(tab, usernameTarget) {
+            document.getElementById('normalView').style.display = tab === 'normal' ? 'flex' : 'none';
+            document.getElementById('subscriptionsView').style.display = tab === 'subscriptions' ? 'flex' : 'none';
+            document.getElementById('profileView').style.display = tab === 'profile' ? 'flex' : 'none';
+
+            document.getElementById('btnNormal').classList.remove('nav-active');
+            document.getElementById('btnSubs').classList.remove('nav-active');
+            document.getElementById('btnProfile').classList.remove('nav-active');
+
+            if (tab === 'profile') {
+                document.body.classList.add('profile-active-page');
+                if (currentUser && usernameTarget && cleanUsernameRaw(currentUser.username) === cleanUsernameRaw(usernameTarget)) {
+                    document.getElementById('btnProfile').classList.add('nav-active');
+                }
+                renderProfile(usernameTarget);
+            } else {
+                document.body.classList.remove('profile-active-page');
+            }
+
+            if (tab === 'normal') document.getElementById('btnNormal').classList.add('nav-active');
+            if (tab === 'subscriptions') {
+                document.getElementById('btnSubs').classList.add('nav-active');
+                renderSubscriptionsTab();
+            }
+        }
+
+        function shareCurrentVideo() { navigator.clipboard.writeText(window.location.href); showCustomPopup("Paylaşım", "Bağlantı kopyalandı!"); }
+        
+        function openModal(id) { 
+            document.getElementById(id).style.display = 'flex'; 
+            if (id === 'modPanelModal') renderModVideoList();
+        }
+        
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function toggleTheme() { document.body.setAttribute('data-theme', document.body.getAttribute('data-theme') === 'light' ? 'dark' : 'light'); }
+    </script>
+</body>
+</html>            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+        }
+
+        .owner-badge {
+            color: #ff0033 !important;
+            font-weight: 900 !important;
+            letter-spacing: 1px;
+            text-shadow: 0 0 8px rgba(255, 0, 51, 0.4);
+            margin-left: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .blue-tick {
+            color: #0099ff !important;
+            font-weight: bold;
+            font-size: 14px;
+            text-shadow: 0 0 6px rgba(0, 153, 255, 0.6);
+        }
+
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 20px; margin: 10px; border-radius: 20px;
+            position: sticky; top: 10px; z-index: 100; gap: 10px; flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 24px; font-weight: 900;
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            cursor: pointer;
+        }
+
         .search-box {
             position: relative;
             display: flex; align-items: center; gap: 5px; flex: 1; max-width: 380px;
