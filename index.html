@@ -351,7 +351,7 @@
         <!-- 🔎 KANAL ARAMA ÇUBUĞU VE DROPDOWN -->
         <div class="search-box">
             <span class="search-icon">🔍</span>
-            <input type="text" id="searchInput" placeholder="Kanal / Kullanıcı ara..." oninput="handleChannelSearch()" onfocus="handleChannelSearch()">
+            <input type="text" id="searchInput" placeholder="Kanal / Kullanıcı ara (@kullanici)..." oninput="handleChannelSearch()" onfocus="handleChannelSearch()">
             <div class="search-results-dropdown" id="searchResultsDropdown"></div>
         </div>
 
@@ -359,7 +359,7 @@
             <button class="btn nav-active" id="btnNormal" onclick="switchTab('normal')">Videolar</button>
             <button class="btn" id="btnSubs" onclick="switchTab('subscriptions')">🔔 Abonelikler</button>
             <button class="btn" id="btnProfile" onclick="switchTab('profile', currentUser ? currentUser.username : null)" style="display:none;">👤 Profilim</button>
-            <!-- xir-4x MOD PANELİ BUTONU -->
+            <!-- @xir-4x MOD PANELİ BUTONU -->
             <button class="btn btn-danger" id="btnModPanel" onclick="openModal('modPanelModal')" style="display:none;">🛡️ Mod Paneli</button>
         </div>
 
@@ -452,7 +452,7 @@
     <div class="modal" id="loginModal">
         <div class="modal-content glass">
             <h3>Giriş Yap</h3>
-            <input type="text" id="loginUsername" placeholder="Kullanıcı Adı">
+            <input type="text" id="loginUsername" placeholder="Kullanıcı Adı (@kullanici)">
             <input type="password" id="loginPassword" placeholder="Şifre">
             <button class="btn btn-primary" onclick="login()">Giriş Yap</button>
             <button class="btn" onclick="closeModal('loginModal')">İptal</button>
@@ -462,7 +462,7 @@
     <div class="modal" id="registerModal">
         <div class="modal-content glass">
             <h3>Kayıt Ol</h3>
-            <input type="text" id="regUsername" placeholder="Kullanıcı Adı">
+            <input type="text" id="regUsername" placeholder="Kullanıcı Adı (@kullanici)">
             <input type="password" id="regPassword" placeholder="Şifre (Min 8 Karakter)">
             <button class="btn btn-primary" id="registerBtn" onclick="register()">Kayıt Ol</button>
             <button class="btn" onclick="closeModal('registerModal')">İptal</button>
@@ -532,24 +532,26 @@
         </div>
     </div>
 
-    <!-- 🛡️ xir-4x YÖNETİCİ MOD PANELİ MODAL -->
+    <!-- 🛡️ @xir-4x YÖNETİCİ MOD PANELİ MODAL -->
     <div class="modal" id="modPanelModal">
         <div class="modal-content glass" style="max-width: 460px;">
-            <h3 style="color:#ff0055; font-size:20px;">🛡️ Yönetici Mod Paneli (xir-4x)</h3>
+            <h3 style="color:#ff0055; font-size:20px;">🛡️ Yönetici Mod Paneli (@xir-4x)</h3>
             <p style="font-size:12px; opacity:0.8;">Sistemi yönetmek için özel kontrol merkezi.</p>
             
             <hr class="modal-section-divider">
 
-            <!-- 1. UYARI VE BAN YÖNETİMİ -->
+            <!-- 1. UYARI, BİLGİ VE BAN YÖNETİMİ -->
             <label class="form-label">👤 Kullanıcı Seç / Yaz:</label>
-            <input type="text" id="modTargetUser" placeholder="Hedef kullanıcı adını girin...">
+            <input type="text" id="modTargetUser" placeholder="Hedef kullanıcı adı (Örn: @ahmet)...">
+
+            <textarea id="modUserMsg" placeholder="Gönderilecek özel uyarı veya bilgi mesajını girin..."></textarea>
 
             <div style="display:flex; gap:8px;">
-                <input type="text" id="modWarnMsg" placeholder="Uyarı mesajı..." style="flex:1;">
-                <button class="btn btn-primary" onclick="sendUserWarning()">⚠️ Uyar</button>
+                <button class="btn btn-primary" style="flex:1;" onclick="sendUserMessage('warn')">⚠️ Uyar</button>
+                <button class="btn" style="flex:1; background:#0099ff; color:#fff;" onclick="sendUserMessage('info')">ℹ️ Özel Bilgi</button>
             </div>
 
-            <div style="display:flex; gap:8px; margin-top:4px;">
+            <div style="display:flex; gap:8px; margin-top:8px;">
                 <button class="btn btn-danger" style="width:100%;" onclick="toggleUserBan(true)">🚫 Kullanıcıyı Banla</button>
                 <button class="btn" style="width:100%;" onclick="toggleUserBan(false)">✅ Banı Kaldır</button>
             </div>
@@ -594,6 +596,16 @@
         let bannerMarkedForRemoval = false;
         const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150";
 
+        // KULLANICI ADI FORMATLAMA (@ İŞARETİ GARANTİSİ)
+        function formatUsername(name) {
+            if (!name) return '';
+            let cleaned = name.trim();
+            if (!cleaned.startsWith('@')) {
+                cleaned = '@' + cleaned;
+            }
+            return cleaned;
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             updateUserUI();
             fetchCloudData();
@@ -607,7 +619,7 @@
 
         // 🏷️ MAVİ TİK VE SAHİP ROZETİ KONTROLÜ
         function checkOwnerBadge(username) {
-            if (username && username.toLowerCase().trim() === "xir-4x") {
+            if (username && formatUsername(username).toLowerCase() === "@xir-4x") {
                 return `<span class="owner-badge"><span class="blue-tick">✔</span> [OWNER]</span>`;
             }
             return '';
@@ -648,7 +660,7 @@
             checkSystemNotifications();
         }
 
-        // 🛡️ SİSTEM BİLDİRİMLERİ (BAN, UYARI, HBS POP-UP KONTROLÜ)
+        // 🛡️ SİSTEM BİLDİRİMLERİ (BAN, UYARI, BİLGİ, HBS POP-UP KONTROLÜ)
         async function checkSystemNotifications() {
             if (!currentUser) return;
 
@@ -660,7 +672,7 @@
 
             // BAN KONTROLÜ
             if (currentUser.is_banned) {
-                showCustomPopup("🛑 ERİŞİM ENGELİ!", "Hesabınız site kurallarını ihlal ettiği için yönetici (xir-4x) tarafından yasaklanmıştır.");
+                showCustomPopup("🛑 ERİŞİM ENGELİ!", "Hesabınız site kurallarını ihlal ettiği için yönetici (@xir-4x) tarafından yasaklanmıştır.");
                 document.body.innerHTML = `<div style="display:flex; height:100vh; align-items:center; justify-content:center; flex-direction:column; color:#ff0055; text-align:center; padding:20px;"><h1>🛑 HESABINIZ BANLANDI</h1><p>Platform erişiminiz engellenmiştir.</p></div>`;
                 return;
             }
@@ -668,42 +680,57 @@
             // UYARI SİSTEMİ POP-UP
             if (currentUser.warning_msg) {
                 showCustomPopup("⚠️ YÖNETİCİ UYARISI", currentUser.warning_msg);
-                // Okundu olarak temizle
                 await supabaseClient.from('users').update({ warning_msg: null }).eq('id', currentUser.id);
+            }
+
+            // ÖZEL BİLGİ SİSTEMİ POP-UP
+            if (currentUser.info_msg) {
+                showCustomPopup("ℹ️ YÖNETİCİ BİLGİLENDİRMESİ", currentUser.info_msg);
+                await supabaseClient.from('users').update({ info_msg: null }).eq('id', currentUser.id);
             }
 
             // HERKES BİLGİ SİSTEMİ (HBS) POP-UP KONTROLÜ
             const lastHBS = localStorage.getItem('last_seen_hbs');
-            const hbsNotice = currentUser.hbs_announcement || localStorage.getItem('global_hbs_msg');
+            const hbsNotice = localStorage.getItem('global_hbs_msg');
             if (hbsNotice && lastHBS !== hbsNotice) {
                 showCustomPopup("📢 DUYURU (HBS)", hbsNotice);
                 localStorage.setItem('last_seen_hbs', hbsNotice);
             }
         }
 
-        // 🛡️ MOD PANOLU İŞLEMLERİ (YALNIZCA xir-4x İÇİN)
-        async function sendUserWarning() {
-            const target = document.getElementById('modTargetUser').value.trim();
-            const msg = document.getElementById('modWarnMsg').value.trim();
-            if (!target || !msg) return showCustomPopup("Hata", "Lütfen kullanıcı adı ve uyarı mesajı girin!");
+        // 🛡️ MOD PANOLU İŞLEMLERİ (YALNIZCA @xir-4x İÇİN)
+        async function sendUserMessage(type) {
+            const rawTarget = document.getElementById('modTargetUser').value.trim();
+            const msg = document.getElementById('modUserMsg').value.trim();
+            if (!rawTarget || !msg) return showCustomPopup("Hata", "Lütfen kullanıcı adı ve mesaj girin!");
 
-            const user = loadedUsers.find(u => u.username.toLowerCase() === target.toLowerCase());
-            if (!user) return showCustomPopup("Hata", "Kullanıcı bulunamadı!");
+            const target = formatUsername(rawTarget);
+            const user = loadedUsers.find(u => formatUsername(u.username).toLowerCase() === target.toLowerCase());
+            if (!user) return showCustomPopup("Hata", `${target} kullanıcı bulunamadı!`);
 
-            await supabaseClient.from('users').update({ warning_msg: msg }).eq('id', user.id);
-            showCustomPopup("Başarılı", `${target} kullanıcısına uyarı pop-up mesajı gönderildi!`);
-            document.getElementById('modWarnMsg').value = '';
+            if (type === 'warn') {
+                await supabaseClient.from('users').update({ warning_msg: msg }).eq('id', user.id);
+                showCustomPopup("Başarılı", `${target} kullanıcısına UYARI mesajı gönderildi!`);
+            } else if (type === 'info') {
+                await supabaseClient.from('users').update({ info_msg: msg }).eq('id', user.id);
+                showCustomPopup("Başarılı", `${target} kullanıcısına BİLGİ mesajı gönderildi!`);
+            }
+
+            document.getElementById('modUserMsg').value = '';
+            fetchCloudData();
         }
 
         async function toggleUserBan(status) {
-            const target = document.getElementById('modTargetUser').value.trim();
-            if (!target) return showCustomPopup("Hata", "Lütfen kullanıcı adı girin!");
+            const rawTarget = document.getElementById('modTargetUser').value.trim();
+            if (!rawTarget) return showCustomPopup("Hata", "Lütfen kullanıcı adı girin!");
 
-            const user = loadedUsers.find(u => u.username.toLowerCase() === target.toLowerCase());
-            if (!user) return showCustomPopup("Hata", "Kullanıcı bulunamadı!");
+            const target = formatUsername(rawTarget);
+            const user = loadedUsers.find(u => formatUsername(u.username).toLowerCase() === target.toLowerCase());
+            if (!user) return showCustomPopup("Hata", `${target} kullanıcısı bulunamadı!`);
 
             await supabaseClient.from('users').update({ is_banned: status }).eq('id', user.id);
             showCustomPopup("Başarılı", `${target} kullanıcısının ban durumu: ${status ? 'BANLANDI' : 'KALDIRILDI'}`);
+            fetchCloudData();
         }
 
         async function publishHBSAnnouncement() {
@@ -716,7 +743,7 @@
         }
 
         async function deleteVideo(videoId) {
-            if (!currentUser || currentUser.username.toLowerCase() !== "xir-4x") return;
+            if (!currentUser || formatUsername(currentUser.username).toLowerCase() !== "@xir-4x") return;
             
             const confirmDelete = confirm("Bu videoyu silmek istediğinizden emin misiniz?");
             if (!confirmDelete) return;
@@ -736,7 +763,7 @@
             loadedVideos.forEach(v => {
                 container.innerHTML += `
                     <div style="display:flex; justify-content:space-between; align-items:center; background:var(--card-bg); padding:6px 10px; border-radius:8px;">
-                        <span style="font-size:12px; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:260px;">${v.title}</span>
+                        <span style="font-size:12px; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:260px;">${v.title} (${v.author})</span>
                         <button class="btn btn-danger" style="font-size:10px; padding:4px 8px;" onclick="deleteVideo(${v.id})">Sil</button>
                     </div>
                 `;
@@ -753,16 +780,16 @@
                 return;
             }
 
-            const matchingUsers = loadedUsers.filter(u => u.username.toLowerCase().includes(query));
+            const matchingUsers = loadedUsers.filter(u => formatUsername(u.username).toLowerCase().includes(query));
 
             if (matchingUsers.length === 0) {
                 dropdown.innerHTML = '<div style="padding:8px; font-size:12px; opacity:0.7;">Kanal bulunamadı.</div>';
             } else {
                 dropdown.innerHTML = matchingUsers.map(u => `
-                    <div class="search-result-item" onclick="viewUserProfile('${u.username}')">
+                    <div class="search-result-item" onclick="viewUserProfile('${formatUsername(u.username)}')">
                         <div style="display:flex; align-items:center; gap:8px;">
                             <img src="${u.avatar || DEFAULT_AVATAR}" style="width:24px; height:24px; border-radius:50%; object-fit:cover;">
-                            <span>${u.username} ${checkOwnerBadge(u.username)}</span>
+                            <span>${formatUsername(u.username)} ${checkOwnerBadge(u.username)}</span>
                         </div>
                         <span style="font-size:11px; opacity:0.6;">Kanalı Gör ➔</span>
                     </div>
@@ -780,24 +807,27 @@
 
         async function toggleSubscribe(channelAuthor) {
             if (!currentUser) return showCustomPopup("Uyarı", "Abone olmak için giriş yapmalısınız!");
-            if (currentUser.username.toLowerCase() === channelAuthor.toLowerCase()) {
+            const myFormatted = formatUsername(currentUser.username);
+            const authorFormatted = formatUsername(channelAuthor);
+
+            if (myFormatted.toLowerCase() === authorFormatted.toLowerCase()) {
                 return showCustomPopup("Uyarı", "Kendi kanalınıza abone olamazsınız!");
             }
 
             let subs = currentUser.subscriptions || [];
-            const isSubbed = subs.includes(channelAuthor);
+            const isSubbed = subs.includes(authorFormatted);
 
             if (isSubbed) {
-                subs = subs.filter(u => u !== channelAuthor);
+                subs = subs.filter(u => u !== authorFormatted);
             } else {
-                subs.push(channelAuthor);
+                subs.push(authorFormatted);
             }
 
             currentUser.subscriptions = subs;
             localStorage.setItem('oldtube_user', JSON.stringify(currentUser));
 
-            renderSubButton(channelAuthor);
-            renderProfileSubButton(channelAuthor);
+            renderSubButton(authorFormatted);
+            renderProfileSubButton(authorFormatted);
 
             await supabaseClient.from('users').update({ subscriptions: subs }).eq('id', currentUser.id);
 
@@ -810,14 +840,15 @@
             const container = document.getElementById('subButtonContainer');
             if (!container) return;
 
-            if (!currentUser || currentUser.username.toLowerCase() === channelAuthor.toLowerCase()) {
+            const authorFormatted = formatUsername(channelAuthor);
+            if (!currentUser || formatUsername(currentUser.username).toLowerCase() === authorFormatted.toLowerCase()) {
                 container.innerHTML = '';
                 return;
             }
 
-            const isSubbed = (currentUser.subscriptions || []).includes(channelAuthor);
+            const isSubbed = (currentUser.subscriptions || []).includes(authorFormatted);
             container.innerHTML = `
-                <button class="sub-btn ${isSubbed ? 'subscribed' : 'not-subscribed'}" onclick="toggleSubscribe('${channelAuthor}')">
+                <button class="sub-btn ${isSubbed ? 'subscribed' : 'not-subscribed'}" onclick="toggleSubscribe('${authorFormatted}')">
                     ${isSubbed ? '✓ Abonesin' : '🔔 Abone Ol'}
                 </button>
             `;
@@ -827,14 +858,15 @@
             const container = document.getElementById('profilePageSubBtn');
             if (!container) return;
 
-            if (!currentUser || currentUser.username.toLowerCase() === channelAuthor.toLowerCase()) {
+            const authorFormatted = formatUsername(channelAuthor);
+            if (!currentUser || formatUsername(currentUser.username).toLowerCase() === authorFormatted.toLowerCase()) {
                 container.innerHTML = '';
                 return;
             }
 
-            const isSubbed = (currentUser.subscriptions || []).includes(channelAuthor);
+            const isSubbed = (currentUser.subscriptions || []).includes(authorFormatted);
             container.innerHTML = `
-                <button class="sub-btn ${isSubbed ? 'subscribed' : 'not-subscribed'}" onclick="toggleSubscribe('${channelAuthor}')">
+                <button class="sub-btn ${isSubbed ? 'subscribed' : 'not-subscribed'}" onclick="toggleSubscribe('${authorFormatted}')">
                     ${isSubbed ? '✓ Abonesin' : '🔔 Abone Ol'}
                 </button>
             `;
@@ -935,19 +967,20 @@
 
         // PROFİL SİSTEMİ
         async function renderProfile(usernameTarget) {
-            const username = usernameTarget || (currentUser ? currentUser.username : null);
-            if (!username) return;
+            const rawName = usernameTarget || (currentUser ? currentUser.username : null);
+            if (!rawName) return;
 
+            const username = formatUsername(rawName);
             const { data } = await supabaseClient.from('users').select('*').ilike('username', username);
             viewedProfileUser = (data && data.length > 0) ? data[0] : null;
 
             if (!viewedProfileUser) {
-                showCustomPopup("Hata", "Kullanıcı bulunamadı!");
+                showCustomPopup("Hata", `${username} kullanıcısı bulunamadı!`);
                 switchTab('normal');
                 return;
             }
 
-            document.getElementById('profileNameDisplay').innerHTML = viewedProfileUser.username + checkOwnerBadge(viewedProfileUser.username);
+            document.getElementById('profileNameDisplay').innerHTML = formatUsername(viewedProfileUser.username) + checkOwnerBadge(viewedProfileUser.username);
             document.getElementById('profileBioDisplay').innerText = viewedProfileUser.bio || "Henüz biyografi eklenmedi.";
             document.getElementById('profileAvatarDisplay').src = viewedProfileUser.avatar || DEFAULT_AVATAR;
 
@@ -979,7 +1012,7 @@
                 audioPlayer.src = '';
             }
 
-            const isMyOwn = currentUser && currentUser.username.toLowerCase() === viewedProfileUser.username.toLowerCase();
+            const isMyOwn = currentUser && formatUsername(currentUser.username).toLowerCase() === username.toLowerCase();
             document.getElementById('editProfileBtn').style.display = isMyOwn ? 'inline-block' : 'none';
 
             if (isMyOwn) {
@@ -999,17 +1032,18 @@
                     removeBtn.style.display = 'none';
                 }
             } else {
-                renderProfileSubButton(viewedProfileUser.username);
+                renderProfileSubButton(username);
             }
 
-            renderUserVideos(viewedProfileUser.username);
+            renderUserVideos(username);
         }
 
         function renderUserVideos(username) {
             const grid = document.getElementById('profileVideosGrid');
             grid.innerHTML = '';
 
-            const userVids = loadedVideos.filter(v => v.author.toLowerCase() === username.toLowerCase());
+            const formatted = formatUsername(username);
+            const userVids = loadedVideos.filter(v => formatUsername(v.author).toLowerCase() === formatted.toLowerCase());
 
             if (userVids.length === 0) {
                 grid.innerHTML = '<p style="opacity:0.7; grid-column:1/-1;">Bu kanal henüz hiç video yüklememiş.</p>';
@@ -1024,7 +1058,7 @@
                     <img src="${v.thumb || 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=300'}" alt="${v.title}">
                     <div class="video-card-info">
                         <h4>${v.title}</h4>
-                        <span style="font-size:11px; opacity:0.8;">Yükleyen: ${v.author}</span>
+                        <span style="font-size:11px; opacity:0.8;">Yükleyen: ${formatUsername(v.author)}</span>
                     </div>
                 `;
                 grid.appendChild(card);
@@ -1110,7 +1144,7 @@
                 }
 
                 await supabaseClient.from('videos').insert([{
-                    title, url: videoUrl, thumb: thumbUrl, type: 'normal', description: desc, author: currentUser.username
+                    title, url: videoUrl, thumb: thumbUrl, type: 'normal', description: desc, author: formatUsername(currentUser.username)
                 }]);
 
                 showCustomPopup("Tebrikler!", "Videonuz başarıyla yüklendi ve yayınlandı.");
@@ -1129,17 +1163,18 @@
             const holder = document.getElementById('playerHolder');
             holder.innerHTML = `<video src="${video.url}" controls autoplay></video>`;
 
+            const authorFormatted = formatUsername(video.author);
             document.getElementById('videoTitle').innerText = video.title;
-            document.getElementById('videoAuthor').innerHTML = `Yükleyen: <span class="clickable-user" onclick="switchTab('profile', '${video.author}')">${video.author}</span> ${checkOwnerBadge(video.author)}`;
+            document.getElementById('videoAuthor').innerHTML = `Yükleyen: <span class="clickable-user" onclick="switchTab('profile', '${authorFormatted}')">${authorFormatted}</span> ${checkOwnerBadge(authorFormatted)}`;
             document.getElementById('videoDescription').innerText = video.description || '';
 
-            renderSubButton(video.author);
+            renderSubButton(authorFormatted);
 
             document.getElementById('normalActionsBar').style.display = 'flex';
             document.getElementById('normalCommentsSection').style.display = 'flex';
 
             // Kurucu için video sil butonunu aktif et
-            if (currentUser && currentUser.username.toLowerCase() === "xir-4x") {
+            if (currentUser && formatUsername(currentUser.username).toLowerCase() === "@xir-4x") {
                 document.getElementById('deleteCurrentVidBtn').style.display = 'inline-flex';
             } else {
                 document.getElementById('deleteCurrentVidBtn').style.display = 'none';
@@ -1165,7 +1200,7 @@
             if (!currentUser) return showCustomPopup("Uyarı", "Giriş yapmalısınız!");
             let likes = currentPlayingVideo.likes || [];
             let dislikes = currentPlayingVideo.dislikes || [];
-            const user = currentUser.username;
+            const user = formatUsername(currentUser.username);
 
             if (type === 'like') {
                 likes = likes.includes(user) ? likes.filter(u => u !== user) : [...likes, user];
@@ -1189,7 +1224,7 @@
             if (!text) return;
 
             let comments = currentPlayingVideo.comments || [];
-            comments.push({ author: currentUser.username, avatar: currentUser.avatar || DEFAULT_AVATAR, text });
+            comments.push({ author: formatUsername(currentUser.username), avatar: currentUser.avatar || DEFAULT_AVATAR, text });
 
             currentPlayingVideo.comments = comments;
             await supabaseClient.from('videos').update({ comments }).eq('id', currentPlayingVideo.id);
@@ -1202,12 +1237,13 @@
             const container = document.getElementById('commentsListContainer');
             container.innerHTML = '';
             (currentPlayingVideo.comments || []).slice().reverse().forEach(c => {
+                const authorFormatted = formatUsername(c.author);
                 container.innerHTML += `
                     <div class="comment-item">
                         <img src="${c.avatar || DEFAULT_AVATAR}" class="comment-avatar">
                         <div class="comment-content">
                             <div style="font-size:11px; font-weight:bold;">
-                                <span class="clickable-user" onclick="switchTab('profile', '${c.author}')">${c.author}</span> ${checkOwnerBadge(c.author)}
+                                <span class="clickable-user" onclick="switchTab('profile', '${authorFormatted}')">${authorFormatted}</span> ${checkOwnerBadge(authorFormatted)}
                             </div>
                             <div style="font-size:12px; margin-top:2px;">${c.text}</div>
                         </div>
@@ -1225,6 +1261,7 @@
             }
 
             videoArray.forEach(v => {
+                const authorFormatted = formatUsername(v.author);
                 const card = document.createElement('div');
                 card.className = 'video-card';
                 card.onclick = () => playVideo(v);
@@ -1232,7 +1269,7 @@
                     <img src="${v.thumb || 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=300'}" alt="${v.title}">
                     <div class="video-card-info">
                         <h4>${v.title}</h4>
-                        <span style="font-size:11px; opacity:0.8;">Kanal: ${v.author} ${checkOwnerBadge(v.author)}</span>
+                        <span style="font-size:11px; opacity:0.8;">Kanal: ${authorFormatted} ${checkOwnerBadge(authorFormatted)}</span>
                     </div>
                 `;
                 listContainer.appendChild(card);
@@ -1255,18 +1292,19 @@
             }
 
             mySubs.forEach(authorName => {
-                const targetUser = loadedUsers.find(u => u.username.toLowerCase() === authorName.toLowerCase());
+                const formatted = formatUsername(authorName);
+                const targetUser = loadedUsers.find(u => formatUsername(u.username).toLowerCase() === formatted.toLowerCase());
                 const avatar = targetUser ? (targetUser.avatar || DEFAULT_AVATAR) : DEFAULT_AVATAR;
 
                 const card = document.createElement('div');
                 card.className = 'channel-card';
-                card.onclick = () => switchTab('profile', authorName);
+                card.onclick = () => switchTab('profile', formatted);
                 card.innerHTML = `
                     <div style="display:flex; align-items:center; gap:12px;">
                         <img src="${avatar}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
                         <div>
-                            <span style="font-weight:bold; font-size:14px;">${authorName}</span>
-                            ${checkOwnerBadge(authorName)}
+                            <span style="font-weight:bold; font-size:14px;">${formatted}</span>
+                            ${checkOwnerBadge(formatted)}
                         </div>
                     </div>
                     <button class="btn" style="font-size:11px;">Kanalı Gör ➔</button>
@@ -1276,10 +1314,12 @@
         }
 
         async function register() {
-            const username = document.getElementById('regUsername').value.trim();
+            const rawUser = document.getElementById('regUsername').value;
             const password = document.getElementById('regPassword').value;
 
-            if (!username || !password) return showCustomPopup("Hata", "Tüm alanları doldurun!");
+            if (!rawUser || !password) return showCustomPopup("Hata", "Tüm alanları doldurun!");
+
+            const username = formatUsername(rawUser);
 
             try {
                 const { data: existing } = await supabaseClient.from('users').select('*').ilike('username', username);
@@ -1291,7 +1331,7 @@
 
                 if (error) throw error;
 
-                showCustomPopup("Başarılı", "Kayıt Başarılı! Otomatik giriş yapılıyor.");
+                showCustomPopup("Başarılı", `Kayıt Başarılı! Kullanıcı adınız: ${username}`);
                 currentUser = newUser[0];
                 localStorage.setItem('oldtube_user', JSON.stringify(currentUser));
                 updateUserUI();
@@ -1303,10 +1343,12 @@
         }
 
         async function login() {
-            const username = document.getElementById('loginUsername').value.trim();
+            const rawUser = document.getElementById('loginUsername').value;
             const password = document.getElementById('loginPassword').value;
 
-            if (!username || !password) return showCustomPopup("Hata", "Kullanıcı adı ve şifre girin!");
+            if (!rawUser || !password) return showCustomPopup("Hata", "Kullanıcı adı ve şifre girin!");
+
+            const username = formatUsername(rawUser);
 
             try {
                 const { data, error } = await supabaseClient.from('users')
@@ -1339,14 +1381,14 @@
         }
 
         function updateUserUI() {
-            const isMod = currentUser && currentUser.username.toLowerCase() === "xir-4x";
+            const isMod = currentUser && formatUsername(currentUser.username).toLowerCase() === "@xir-4x";
             
             if (currentUser) {
                 document.getElementById('authButtons').style.display = 'none';
                 document.getElementById('userInfo').style.display = 'flex';
                 document.getElementById('uploadBtn').style.display = 'block';
                 document.getElementById('btnProfile').style.display = 'block';
-                document.getElementById('usernameDisplay').innerHTML = currentUser.username + checkOwnerBadge(currentUser.username);
+                document.getElementById('usernameDisplay').innerHTML = formatUsername(currentUser.username) + checkOwnerBadge(currentUser.username);
                 document.getElementById('headerAvatarImg').src = currentUser.avatar || DEFAULT_AVATAR;
 
                 // Mod Paneli Buton Gösterimi
@@ -1371,7 +1413,7 @@
 
             if (tab === 'profile') {
                 document.body.classList.add('profile-active-page');
-                if (currentUser && usernameTarget && currentUser.username.toLowerCase() === usernameTarget.toLowerCase()) {
+                if (currentUser && usernameTarget && formatUsername(currentUser.username).toLowerCase() === formatUsername(usernameTarget).toLowerCase()) {
                     document.getElementById('btnProfile').classList.add('nav-active');
                 }
                 renderProfile(usernameTarget);
