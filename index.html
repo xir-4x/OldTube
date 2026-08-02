@@ -73,8 +73,17 @@
             font-weight: 900 !important;
             letter-spacing: 1px;
             text-shadow: 0 0 8px rgba(255, 0, 51, 0.4);
-            margin-left: 6px;
-            display: inline-block;
+            margin-left: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .blue-tick {
+            color: #0099ff !important;
+            font-weight: bold;
+            font-size: 14px;
+            text-shadow: 0 0 6px rgba(0, 153, 255, 0.6);
         }
 
         header {
@@ -141,6 +150,7 @@
         }
 
         .btn-primary { background: var(--button-bg); color: var(--button-text); }
+        .btn-danger { background: linear-gradient(180deg, #dc2626 0%, #991b1b 100%); color: #fff; border-color: #ef4444; }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
 
         .sub-btn {
@@ -209,11 +219,11 @@
             gap: 10px; max-height: calc(100vh - 100px); overflow-y: auto;
         }
 
-        /* RESİMLİ VİDEO KARTI */
         .video-card {
             display: flex; gap: 10px; cursor: pointer;
             background: var(--card-bg); padding: 8px; border-radius: 14px;
             border: 1px solid var(--glass-border);
+            position: relative;
         }
         .video-card:hover { background: var(--card-hover); }
         .video-card img { width: 110px; height: 65px; object-fit: cover; border-radius: 10px; background: #333; }
@@ -223,7 +233,6 @@
             display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
         }
 
-        /* KANAL KARTI */
         .channel-card {
             display: flex; justify-content: space-between; align-items: center;
             background: var(--card-bg); padding: 14px 18px; border-radius: 16px;
@@ -231,7 +240,6 @@
         }
         .channel-card:hover { background: var(--card-hover); }
 
-        /* PROFİL SAYFASI YAPISI */
         #profileView { display: none; width: 100%; flex-direction: column; gap: 20px; }
         .profile-header {
             padding: 30px; border-radius: 24px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
@@ -308,6 +316,25 @@
             background: var(--input-bg); padding: 8px 12px; border-radius: 10px; border: 1px solid var(--glass-border);
         }
 
+        /* ÖZEL POP-UP SİSTEMİ STİLLERİ */
+        .custom-popup-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); z-index: 999;
+            justify-content: center; align-items: center; padding: 15px;
+        }
+        .custom-popup-box {
+            background: var(--header-bg);
+            border: 2px solid var(--glass-border);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            border-radius: 20px; padding: 25px; width: 100%; max-width: 420px;
+            display: flex; flex-direction: column; gap: 15px; text-align: center;
+            animation: popupAnim 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popupAnim {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
         @media (max-width: 900px) {
             #normalView { flex-direction: column; }
             header { justify-content: space-between; padding: 10px 15px; }
@@ -332,6 +359,8 @@
             <button class="btn nav-active" id="btnNormal" onclick="switchTab('normal')">Videolar</button>
             <button class="btn" id="btnSubs" onclick="switchTab('subscriptions')">🔔 Abonelikler</button>
             <button class="btn" id="btnProfile" onclick="switchTab('profile', currentUser ? currentUser.username : null)" style="display:none;">👤 Profilim</button>
+            <!-- xir-4x MOD PANELİ BUTONU -->
+            <button class="btn btn-danger" id="btnModPanel" onclick="openModal('modPanelModal')" style="display:none;">🛡️ Mod Paneli</button>
         </div>
 
         <div class="user-section">
@@ -369,6 +398,8 @@
                             <button class="btn" id="likeBtn" onclick="toggleLikeCurrentVideo('like')">👍 <span id="likeCount">0</span></button>
                             <button class="btn" id="dislikeBtn" onclick="toggleLikeCurrentVideo('dislike')">👎 <span id="dislikeCount">0</span></button>
                             <button class="btn" onclick="shareCurrentVideo()">🔗 Paylaş</button>
+                            <!-- KURUCU VİDEO SİLME BUTONU -->
+                            <button class="btn btn-danger" id="deleteCurrentVidBtn" onclick="deleteVideo(currentPlayingVideo.id)" style="display:none;">🗑️ Videoyu Sil</button>
                         </div>
                     </div>
 
@@ -417,6 +448,7 @@
         </div>
     </main>
 
+    <!-- MODALLAR -->
     <div class="modal" id="loginModal">
         <div class="modal-content glass">
             <h3>Giriş Yap</h3>
@@ -500,6 +532,54 @@
         </div>
     </div>
 
+    <!-- 🛡️ xir-4x YÖNETİCİ MOD PANELİ MODAL -->
+    <div class="modal" id="modPanelModal">
+        <div class="modal-content glass" style="max-width: 460px;">
+            <h3 style="color:#ff0055; font-size:20px;">🛡️ Yönetici Mod Paneli (xir-4x)</h3>
+            <p style="font-size:12px; opacity:0.8;">Sistemi yönetmek için özel kontrol merkezi.</p>
+            
+            <hr class="modal-section-divider">
+
+            <!-- 1. UYARI VE BAN YÖNETİMİ -->
+            <label class="form-label">👤 Kullanıcı Seç / Yaz:</label>
+            <input type="text" id="modTargetUser" placeholder="Hedef kullanıcı adını girin...">
+
+            <div style="display:flex; gap:8px;">
+                <input type="text" id="modWarnMsg" placeholder="Uyarı mesajı..." style="flex:1;">
+                <button class="btn btn-primary" onclick="sendUserWarning()">⚠️ Uyar</button>
+            </div>
+
+            <div style="display:flex; gap:8px; margin-top:4px;">
+                <button class="btn btn-danger" style="width:100%;" onclick="toggleUserBan(true)">🚫 Kullanıcıyı Banla</button>
+                <button class="btn" style="width:100%;" onclick="toggleUserBan(false)">✅ Banı Kaldır</button>
+            </div>
+
+            <hr class="modal-section-divider">
+
+            <!-- 2. HERKES BİLGİ SİSTEMİ (HBS) -->
+            <label class="form-label">📢 Herkes Bilgi Sistemi (HBS) Duyurusu:</label>
+            <textarea id="hbsMsgInput" placeholder="Siteye giren herkesin göreceği pop-up mesajı yazın..."></textarea>
+            <button class="btn btn-primary" onclick="publishHBSAnnouncement()">🚀 Duyuruyu Yayınla</button>
+
+            <hr class="modal-section-divider">
+
+            <!-- 3. VİDEO SİLME LİSTESİ -->
+            <label class="form-label">🎬 Yayınlanan Videolar (Silmek için tıklayın):</label>
+            <div id="modVideoList" style="max-height:150px; overflow-y:auto; display:flex; flex-direction:column; gap:6px;"></div>
+
+            <button class="btn" onclick="closeModal('modPanelModal')" style="margin-top:10px;">Kapat</button>
+        </div>
+    </div>
+
+    <!-- 🔔 SİTEYE ÖZGÜN MÜŞTERİ YÜZÜ POP-UP BİLDİRİM BİLEŞENİ -->
+    <div class="custom-popup-overlay" id="customPopupOverlay">
+        <div class="custom-popup-box glass">
+            <h3 id="popupTitle" style="font-size:20px; color:#ff0055;">Bilgilendirme</h3>
+            <p id="popupMessage" style="font-size:14px; line-height:1.5; color:var(--text-color);"></p>
+            <button class="btn btn-primary" style="align-self:center; width:120px; justify-content:center;" onclick="closeCustomPopup()">Anladım</button>
+        </div>
+    </div>
+
     <script>
         const SUPABASE_URL = "https://ptsbvovfwawrivpqolzi.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB0c2J2b3Zmd2F3cml2cHFvbHppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU1OTkzMDIsImV4cCI6MjEwMTE3NTMwMn0.2c0Q4qNjrMwWtzN1ugDm5wj5GfSoPPT35KQozgFtogU";
@@ -525,8 +605,23 @@
             });
         });
 
+        // 🏷️ MAVİ TİK VE SAHİP ROZETİ KONTROLÜ
         function checkOwnerBadge(username) {
-            return (username && username.toLowerCase() === "xir-4x") ? `<span class="owner-badge">[OWNER]</span>` : '';
+            if (username && username.toLowerCase().trim() === "xir-4x") {
+                return `<span class="owner-badge"><span class="blue-tick">✔</span> [OWNER]</span>`;
+            }
+            return '';
+        }
+
+        // 🔔 ÖZEL POP-UP BİLDİRİM SİSTEMİ (STOK YAZILIM YERİNE ÖZGÜN BİLEŞEN)
+        function showCustomPopup(title, message) {
+            document.getElementById('popupTitle').innerText = title;
+            document.getElementById('popupMessage').innerText = message;
+            document.getElementById('customPopupOverlay').style.display = 'flex';
+        }
+
+        function closeCustomPopup() {
+            document.getElementById('customPopupOverlay').style.display = 'none';
         }
 
         function cleanFileName(str) {
@@ -550,6 +645,102 @@
             loadedUsers = uData || [];
 
             renderVideos(loadedVideos);
+            checkSystemNotifications();
+        }
+
+        // 🛡️ SİSTEM BİLDİRİMLERİ (BAN, UYARI, HBS POP-UP KONTROLÜ)
+        async function checkSystemNotifications() {
+            if (!currentUser) return;
+
+            // Güncel kullanıcı verisini çek
+            const { data } = await supabaseClient.from('users').select('*').eq('id', currentUser.id);
+            if (!data || data.length === 0) return;
+            currentUser = data[0];
+            localStorage.setItem('oldtube_user', JSON.stringify(currentUser));
+
+            // BAN KONTROLÜ
+            if (currentUser.is_banned) {
+                showCustomPopup("🛑 ERİŞİM ENGELİ!", "Hesabınız site kurallarını ihlal ettiği için yönetici (xir-4x) tarafından yasaklanmıştır.");
+                document.body.innerHTML = `<div style="display:flex; height:100vh; align-items:center; justify-content:center; flex-direction:column; color:#ff0055; text-align:center; padding:20px;"><h1>🛑 HESABINIZ BANLANDI</h1><p>Platform erişiminiz engellenmiştir.</p></div>`;
+                return;
+            }
+
+            // UYARI SİSTEMİ POP-UP
+            if (currentUser.warning_msg) {
+                showCustomPopup("⚠️ YÖNETİCİ UYARISI", currentUser.warning_msg);
+                // Okundu olarak temizle
+                await supabaseClient.from('users').update({ warning_msg: null }).eq('id', currentUser.id);
+            }
+
+            // HERKES BİLGİ SİSTEMİ (HBS) POP-UP KONTROLÜ
+            const lastHBS = localStorage.getItem('last_seen_hbs');
+            const hbsNotice = currentUser.hbs_announcement || localStorage.getItem('global_hbs_msg');
+            if (hbsNotice && lastHBS !== hbsNotice) {
+                showCustomPopup("📢 DUYURU (HBS)", hbsNotice);
+                localStorage.setItem('last_seen_hbs', hbsNotice);
+            }
+        }
+
+        // 🛡️ MOD PANOLU İŞLEMLERİ (YALNIZCA xir-4x İÇİN)
+        async function sendUserWarning() {
+            const target = document.getElementById('modTargetUser').value.trim();
+            const msg = document.getElementById('modWarnMsg').value.trim();
+            if (!target || !msg) return showCustomPopup("Hata", "Lütfen kullanıcı adı ve uyarı mesajı girin!");
+
+            const user = loadedUsers.find(u => u.username.toLowerCase() === target.toLowerCase());
+            if (!user) return showCustomPopup("Hata", "Kullanıcı bulunamadı!");
+
+            await supabaseClient.from('users').update({ warning_msg: msg }).eq('id', user.id);
+            showCustomPopup("Başarılı", `${target} kullanıcısına uyarı pop-up mesajı gönderildi!`);
+            document.getElementById('modWarnMsg').value = '';
+        }
+
+        async function toggleUserBan(status) {
+            const target = document.getElementById('modTargetUser').value.trim();
+            if (!target) return showCustomPopup("Hata", "Lütfen kullanıcı adı girin!");
+
+            const user = loadedUsers.find(u => u.username.toLowerCase() === target.toLowerCase());
+            if (!user) return showCustomPopup("Hata", "Kullanıcı bulunamadı!");
+
+            await supabaseClient.from('users').update({ is_banned: status }).eq('id', user.id);
+            showCustomPopup("Başarılı", `${target} kullanıcısının ban durumu: ${status ? 'BANLANDI' : 'KALDIRILDI'}`);
+        }
+
+        async function publishHBSAnnouncement() {
+            const msg = document.getElementById('hbsMsgInput').value.trim();
+            if (!msg) return showCustomPopup("Hata", "Duyuru metni boş olamaz!");
+
+            localStorage.setItem('global_hbs_msg', msg);
+            showCustomPopup("HBS Başarılı", "Herkes Bilgi Sistemi (HBS) duyurusu yayınlandı! Tüm kullanıcılar pop-up olarak görecek.");
+            document.getElementById('hbsMsgInput').value = '';
+        }
+
+        async function deleteVideo(videoId) {
+            if (!currentUser || currentUser.username.toLowerCase() !== "xir-4x") return;
+            
+            const confirmDelete = confirm("Bu videoyu silmek istediğinizden emin misiniz?");
+            if (!confirmDelete) return;
+
+            await supabaseClient.from('videos').delete().eq('id', videoId);
+            showCustomPopup("Silindi", "Video platformdan kaldırıldı.");
+            fetchCloudData();
+            if (currentPlayingVideo && currentPlayingVideo.id === videoId) {
+                document.getElementById('playerHolder').innerHTML = '<div id="placeholder" class="placeholder-text">Video Silindi.</div>';
+            }
+        }
+
+        function renderModVideoList() {
+            const container = document.getElementById('modVideoList');
+            if (!container) return;
+            container.innerHTML = '';
+            loadedVideos.forEach(v => {
+                container.innerHTML += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; background:var(--card-bg); padding:6px 10px; border-radius:8px;">
+                        <span style="font-size:12px; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:260px;">${v.title}</span>
+                        <button class="btn btn-danger" style="font-size:10px; padding:4px 8px;" onclick="deleteVideo(${v.id})">Sil</button>
+                    </div>
+                `;
+            });
         }
 
         // 🔎 KANAL ARAMA SİSTEMİ (Sadece Kullanıcılar)
@@ -588,9 +779,9 @@
         }
 
         async function toggleSubscribe(channelAuthor) {
-            if (!currentUser) return alert("Abone olmak için giriş yapmalısınız!");
+            if (!currentUser) return showCustomPopup("Uyarı", "Abone olmak için giriş yapmalısınız!");
             if (currentUser.username.toLowerCase() === channelAuthor.toLowerCase()) {
-                return alert("Kendi kanalınıza abone olamazsınız!");
+                return showCustomPopup("Uyarı", "Kendi kanalınıza abone olamazsınız!");
             }
 
             let subs = currentUser.subscriptions || [];
@@ -673,7 +864,7 @@
         }
 
         async function saveProfile() {
-            if (!currentUser) return alert("Giriş yapmalısınız!");
+            if (!currentUser) return showCustomPopup("Hata", "Giriş yapmalısınız!");
 
             const btn = document.getElementById('saveProfileBtn');
             btn.disabled = true; btn.innerText = "Kaydediliyor...";
@@ -731,18 +922,18 @@
                 localStorage.setItem('oldtube_user', JSON.stringify(currentUser));
                 bannerMarkedForRemoval = false;
 
-                alert("Profiliniz Güncellendi!");
+                showCustomPopup("Başarılı", "Profiliniz Güncellendi!");
                 updateUserUI();
                 renderProfile(currentUser.username);
                 closeModal('editProfileModal');
             } catch (err) {
-                alert("Profil Kayıt Hatası: " + err.message);
+                showCustomPopup("Hata", "Profil Kayıt Hatası: " + err.message);
             } finally {
                 btn.disabled = false; btn.innerText = "Değişiklikleri Kaydet";
             }
         }
 
-        // PROFİL SİSTEMİ (Başka Kullanıcıların Profillerini Görünür Yapar)
+        // PROFİL SİSTEMİ
         async function renderProfile(usernameTarget) {
             const username = usernameTarget || (currentUser ? currentUser.username : null);
             if (!username) return;
@@ -751,7 +942,7 @@
             viewedProfileUser = (data && data.length > 0) ? data[0] : null;
 
             if (!viewedProfileUser) {
-                alert("Kullanıcı bulunamadı!");
+                showCustomPopup("Hata", "Kullanıcı bulunamadı!");
                 switchTab('normal');
                 return;
             }
@@ -760,7 +951,6 @@
             document.getElementById('profileBioDisplay').innerText = viewedProfileUser.bio || "Henüz biyografi eklenmedi.";
             document.getElementById('profileAvatarDisplay').src = viewedProfileUser.avatar || DEFAULT_AVATAR;
 
-            // Renk Özelleştirmelerini Aç/Uygula
             const primaryColor = viewedProfileUser.profile_color || '#ff0055';
             const pageBgColor = viewedProfileUser.profile_bg_color || '#0b2545';
             const cardDarkerBg = adjustColorBrightness(pageBgColor, -30);
@@ -769,7 +959,6 @@
             document.documentElement.style.setProperty('--profile-page-bg', pageBgColor);
             document.documentElement.style.setProperty('--profile-card-darker-bg', cardDarkerBg);
 
-            // Kart Arka Planı: Fotoğraf varsa fotoğraf, yoksa renk
             const headerCard = document.getElementById('profileHeaderCard');
             if (viewedProfileUser.profile_banner) {
                 headerCard.style.setProperty('background',
@@ -779,7 +968,6 @@
                 headerCard.style.removeProperty('background');
             }
 
-            // Müzik Çalar
             const musicContainer = document.getElementById('profileMusicContainer');
             const audioPlayer = document.getElementById('profileAudioPlayer');
 
@@ -791,7 +979,6 @@
                 audioPlayer.src = '';
             }
 
-            // Profili Düzenle Butonu Sadece Kendi Profilimizde Görünsün
             const isMyOwn = currentUser && currentUser.username.toLowerCase() === viewedProfileUser.username.toLowerCase();
             document.getElementById('editProfileBtn').style.display = isMyOwn ? 'inline-block' : 'none';
 
@@ -815,7 +1002,6 @@
                 renderProfileSubButton(viewedProfileUser.username);
             }
 
-            // KULLANICININ YÜKLEDİĞİ VİDEOLARI LİSTELE
             renderUserVideos(viewedProfileUser.username);
         }
 
@@ -896,14 +1082,14 @@
         }
 
         async function addVideo() {
-            if (!currentUser) return alert("Video yüklemek için önce giriş yapmalısınız!");
+            if (!currentUser) return showCustomPopup("Hata", "Video yüklemek için önce giriş yapmalısınız!");
 
             const title = document.getElementById('vTitle').value.trim();
             const fileInput = document.getElementById('vFileInput');
             const thumbInput = document.getElementById('vThumbInput');
             const desc = document.getElementById('vDesc').value.trim();
 
-            if (!title || fileInput.files.length === 0) return alert("Başlık ve Video seçilmelidir!");
+            if (!title || fileInput.files.length === 0) return showCustomPopup("Hata", "Başlık ve Video seçilmelidir!");
 
             const submitBtn = document.getElementById('uploadSubmitBtn');
             submitBtn.disabled = true; submitBtn.innerText = "Yükleniyor...";
@@ -927,14 +1113,14 @@
                     title, url: videoUrl, thumb: thumbUrl, type: 'normal', description: desc, author: currentUser.username
                 }]);
 
-                alert("Tebrikler! Videonuz yüklendi.");
+                showCustomPopup("Tebrikler!", "Videonuz başarıyla yüklendi ve yayınlandı.");
                 closeModal('uploadModal');
                 resetUploadForm();
                 fetchCloudData();
             } catch (err) {
-                alert("HATA: " + err.message);
+                showCustomPopup("Hata", "Video yükleme hatası: " + err.message);
             } finally {
-                submitBtn.disabled = false; submitBtn.innerText = "Yükle ve Paylaş";
+                submitBtn.disabled = false; submitBtn.innerText = "🚀 Yükle ve Paylaş";
             }
         }
 
@@ -951,6 +1137,14 @@
 
             document.getElementById('normalActionsBar').style.display = 'flex';
             document.getElementById('normalCommentsSection').style.display = 'flex';
+
+            // Kurucu için video sil butonunu aktif et
+            if (currentUser && currentUser.username.toLowerCase() === "xir-4x") {
+                document.getElementById('deleteCurrentVidBtn').style.display = 'inline-flex';
+            } else {
+                document.getElementById('deleteCurrentVidBtn').style.display = 'none';
+            }
+
             renderInteractionUI();
         }
 
@@ -968,7 +1162,7 @@
         }
 
         async function toggleLikeCurrentVideo(type) {
-            if (!currentUser) return alert("Giriş yapmalısınız!");
+            if (!currentUser) return showCustomPopup("Uyarı", "Giriş yapmalısınız!");
             let likes = currentPlayingVideo.likes || [];
             let dislikes = currentPlayingVideo.dislikes || [];
             const user = currentUser.username;
@@ -989,7 +1183,7 @@
         }
 
         async function submitComment() {
-            if (!currentUser) return alert("Giriş yapmalısınız!");
+            if (!currentUser) return showCustomPopup("Uyarı", "Giriş yapmalısınız!");
             const input = document.getElementById('commentInput');
             const text = input.value.trim();
             if (!text) return;
@@ -1045,7 +1239,6 @@
             });
         }
 
-        // ABONE OLUNAN KANALLARIN LİSTESİ (Sadece Kanallar)
         function renderSubscriptionsTab() {
             const listContainer = document.getElementById('subsChannelsList');
             listContainer.innerHTML = '';
@@ -1086,11 +1279,11 @@
             const username = document.getElementById('regUsername').value.trim();
             const password = document.getElementById('regPassword').value;
 
-            if (!username || !password) return alert("Tüm alanları doldurun!");
+            if (!username || !password) return showCustomPopup("Hata", "Tüm alanları doldurun!");
 
             try {
                 const { data: existing } = await supabaseClient.from('users').select('*').ilike('username', username);
-                if (existing && existing.length > 0) return alert("Bu kullanıcı adı zaten alınmış!");
+                if (existing && existing.length > 0) return showCustomPopup("Hata", "Bu kullanıcı adı zaten alınmış!");
 
                 const { data: newUser, error } = await supabaseClient.from('users').insert([{ 
                     username, password, avatar: DEFAULT_AVATAR, subscriptions: []
@@ -1098,14 +1291,14 @@
 
                 if (error) throw error;
 
-                alert("Kayıt Başarılı! Otomatik giriş yapılıyor.");
+                showCustomPopup("Başarılı", "Kayıt Başarılı! Otomatik giriş yapılıyor.");
                 currentUser = newUser[0];
                 localStorage.setItem('oldtube_user', JSON.stringify(currentUser));
                 updateUserUI();
                 closeModal('registerModal');
                 fetchCloudData();
             } catch (err) {
-                alert("Kayıt Hatası: " + err.message);
+                showCustomPopup("Kayıt Hatası", err.message);
             }
         }
 
@@ -1113,7 +1306,7 @@
             const username = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value;
 
-            if (!username || !password) return alert("Kullanıcı adı ve şifre girin!");
+            if (!username || !password) return showCustomPopup("Hata", "Kullanıcı adı ve şifre girin!");
 
             try {
                 const { data, error } = await supabaseClient.from('users')
@@ -1128,12 +1321,13 @@
                     localStorage.setItem('oldtube_user', JSON.stringify(currentUser));
                     updateUserUI();
                     closeModal('loginModal');
-                    alert("Giriş Yapıldı! Hoş geldin " + currentUser.username);
+                    showCustomPopup("Hoş Geldin!", "Giriş Yapıldı: " + currentUser.username);
+                    checkSystemNotifications();
                 } else {
-                    alert("Kullanıcı adı veya şifre hatalı!");
+                    showCustomPopup("Hata", "Kullanıcı adı veya şifre hatalı!");
                 }
             } catch (err) {
-                alert("Giriş Hatası: " + err.message);
+                showCustomPopup("Giriş Hatası", err.message);
             }
         }
 
@@ -1145,6 +1339,8 @@
         }
 
         function updateUserUI() {
+            const isMod = currentUser && currentUser.username.toLowerCase() === "xir-4x";
+            
             if (currentUser) {
                 document.getElementById('authButtons').style.display = 'none';
                 document.getElementById('userInfo').style.display = 'flex';
@@ -1152,11 +1348,15 @@
                 document.getElementById('btnProfile').style.display = 'block';
                 document.getElementById('usernameDisplay').innerHTML = currentUser.username + checkOwnerBadge(currentUser.username);
                 document.getElementById('headerAvatarImg').src = currentUser.avatar || DEFAULT_AVATAR;
+
+                // Mod Paneli Buton Gösterimi
+                document.getElementById('btnModPanel').style.display = isMod ? 'inline-flex' : 'none';
             } else {
                 document.getElementById('authButtons').style.display = 'flex';
                 document.getElementById('userInfo').style.display = 'none';
                 document.getElementById('uploadBtn').style.display = 'none';
                 document.getElementById('btnProfile').style.display = 'none';
+                document.getElementById('btnModPanel').style.display = 'none';
             }
         }
 
@@ -1186,8 +1386,13 @@
             }
         }
 
-        function shareCurrentVideo() { navigator.clipboard.writeText(window.location.href); alert("Bağlantı Kopyalandı!"); }
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function shareCurrentVideo() { navigator.clipboard.writeText(window.location.href); showCustomPopup("Paylaşım", "Bağlantı kopyalandı!"); }
+        
+        function openModal(id) { 
+            document.getElementById(id).style.display = 'flex'; 
+            if (id === 'modPanelModal') renderModVideoList();
+        }
+        
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
         function toggleTheme() { document.body.setAttribute('data-theme', document.body.getAttribute('data-theme') === 'light' ? 'dark' : 'light'); }
     </script>
